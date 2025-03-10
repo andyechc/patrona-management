@@ -14,7 +14,8 @@ import SuccessMessage from "@/components/success-mesage";
 import { useState } from "react";
 
 function ProductAddForm() {
-  const { error, setError, isLoading, handleSubmit } = useCrudOperations("/api/products");
+  const { error, setError, isLoading, handleSubmit } =
+    useCrudOperations("/api/products");
   const [isFinished, setIsFinished] = useState(false);
   const router = useRouter();
 
@@ -22,9 +23,9 @@ function ProductAddForm() {
     setIsFinished(false);
 
     if (data.purchasePrice > data.salePrice) {
-      setError("El precio de venta no puede ser menor al precio de compra")
-      return
-    } else{
+      setError("El precio de venta no puede ser menor al precio de compra");
+      return;
+    } else {
       handleSubmit(data);
       setIsFinished(true);
     }
@@ -39,11 +40,11 @@ function ProductAddForm() {
         name: "",
         purchasePrice: 0,
         salePrice: 0,
-        category: ""
+        category: "",
       }}
-      onCancelClick={()=> router.back()}
+      onCancelClick={() => router.back()}
     >
-      {error && <ErrorMessage error={error} />}
+      {error && <ErrorMessage error={error} setError={() => setError("")} />}
       {isLoading && <Loading />}
       {!error && !isLoading && isFinished && (
         <SuccessMessage

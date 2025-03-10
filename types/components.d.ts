@@ -6,7 +6,7 @@ declare type PageSectionProps = {
 declare type ErrorMessageProps = {
   error: string;
   className?: string,
-  setError: Dispatch<SetStateAction>
+  setError?: Dispatch<SetStateAction>
 };
 
 declare type DataTableProps<TData> = {

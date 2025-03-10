@@ -1,4 +1,4 @@
-import { Schema, model, modelNames, models } from "mongoose";
+import mongoose, { Schema, model } from "mongoose";
 
 const warehouseSchema = new Schema({
   productId: {
@@ -12,7 +12,5 @@ const warehouseSchema = new Schema({
   },
 });
 
-const Warehouse = modelNames().includes("Warehouse")
-  ? models.Warehouse
-  : model("Warehouse", warehouseSchema);
+const Warehouse = mongoose.models.Warehouse || model("Warehouse", warehouseSchema);
 export default Warehouse;

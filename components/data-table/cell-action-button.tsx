@@ -17,7 +17,7 @@ function CellActionButton({ handleDelete, handleEdit }: CellActionButtonProps) {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent
-        align="start"
+        align="end"
         className="bg-background border rounded"
       >
         <DropdownMenuItem

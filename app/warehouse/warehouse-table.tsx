@@ -14,11 +14,15 @@ import {
 import { z } from "zod";
 import { useCrudOperations } from "@/hooks/useCrudOperation";
 import { GenericForm } from "@/components/forms/generic-form";
-import { warehouseEditFormConfig, WarehouseFormSchema } from "@/components/forms/schemas/warehouse";
+import {
+  warehouseEditFormConfig,
+  WarehouseFormSchema,
+} from "@/components/forms/schemas/warehouse";
 import Link from "next/link";
+import ErrorMessage from "@/components/error-message";
 
 function WarehouseTable() {
-  const { data, error, fetchData, handleDelete, handleSubmit, isLoading } =
+  const { data, error, setError, fetchData, handleDelete, handleSubmit, isLoading } =
     useCrudOperations("/api/warehouse");
   const [showEdit, setShowEdit] = useState(false);
   const [warehouseToUpdate, setWarehouseToUpdate] = useState({
@@ -33,8 +37,7 @@ function WarehouseTable() {
 
   const handleEdit = async (id: string) => {
     const warehouse = data.find((item: Product) => item._id === id);
-    console.log(warehouse)
-    
+
     if (warehouse) {
       setWarehouseToUpdate(warehouse);
       setShowEdit(true);
@@ -42,7 +45,7 @@ function WarehouseTable() {
   };
 
   async function onSubmitEdit(data: z.infer<typeof WarehouseFormSchema>) {
-    const filterData = {stock: data.stock}
+    const filterData = { stock: data.stock };
     handleSubmit(filterData, warehouseToUpdate._id);
     setShowEdit(false);
   }
@@ -144,6 +147,14 @@ function WarehouseTable() {
         addHref="/warehouse/add"
       />
 
+      {error && (
+        <ErrorMessage
+          error={error}
+          setError={() => setError("")}
+          className="mt-2 m-auto"
+        />
+      )}
+
       {showEdit && (
         <Dialog open>
           <DialogTrigger asChild>
@@ -168,7 +179,13 @@ function WarehouseTable() {
               </div>
 
               <div>
-                <p className="text-accent-foreground/35 text-sm">Para cambiar estos valores, ve a la sección de <Link href={'/products'} className="underline text-blue-800">Productos</Link>.</p>
+                <p className="text-accent-foreground/35 text-sm">
+                  Para cambiar estos valores, ve a la sección de{" "}
+                  <Link href={"/products"} className="underline text-blue-800">
+                    Productos
+                  </Link>
+                  .
+                </p>
               </div>
             </GenericForm>
           </DialogContent>

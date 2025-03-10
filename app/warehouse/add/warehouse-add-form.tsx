@@ -14,7 +14,7 @@ import {
 import { GenericForm } from "@/components/forms/generic-form";
 
 function WarehouseForm() {
-  const { error, isLoading, handleSubmit } =
+  const { error, setError, isLoading, handleSubmit } =
     useCrudOperations("/api/warehouse");
   const { data, fetchData } = useCrudOperations("/api/products");
   const [isFinished, setIsFinished] = useState(false);
@@ -40,7 +40,7 @@ function WarehouseForm() {
       schema={WarehouseFormSchema}
       selectData={data}
     >
-      {error && <ErrorMessage error={error} />}
+      {error && <ErrorMessage error={error} setError={()=>setError("")}/>}
       {isLoading && <Loading />}
       {!error && !isLoading && isFinished && (
         <SuccessMessage
