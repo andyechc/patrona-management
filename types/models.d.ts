@@ -1,21 +1,14 @@
-declare type Category = {
-  name: string,
-  _id: string
-}
-
 declare type Product = {
-  name: string,
-  price: number,
-  category: string,
   _id: string
+  name: string,
+  purchasePrice: number,
+  salePrice: number,
+  category: string,
 }
 
 declare type Warehouse = {
-  name: string,
-  price: number,
-  category: string,
   _id: string,
+  productId: string,
   stock: number,
-  total: number
 }
 

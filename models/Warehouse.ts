@@ -1,27 +1,15 @@
 import { Schema, model, modelNames, models } from "mongoose";
 
 const warehouseSchema = new Schema({
-  name: {
-    type: String,
-    required: [true, "El nombre es obligatorio"],
-    trim: true,
-    unique: true,
-  },
-  price: {
-    type: Number,
-    min: [0, "El precio no puede ser negativo"],
-    required: [true, "El precio es obligatorio"],
-  },
-  category: {
-    type: String,
-    trim: true,
+  productId: {
+    type: Schema.Types.ObjectId,
+    required: true
   },
   stock: {
     type: Number,
+    min: [0, "La cantidad no puede ser negativo"],
+    required: true
   },
-  total: {
-    type: Number
-  }
 });
 
 const Warehouse = modelNames().includes("Warehouse")

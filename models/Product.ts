@@ -7,10 +7,15 @@ const productSchema = new Schema({
     trim: true,
     unique: true,
   },
-  price: {
+  purchasePrice: {
     type: Number,
-    min: [0, "El precio no puede ser negativo"],
-    required: [true, "El precio es obligatorio"],
+    min: [0, "El precio de compra no puede ser negativo"],
+    required: [true, "El precio de compra es obligatorio"],
+  },
+  salePrice: {
+    type: Number,
+    min: [0, "El precio de venta no puede ser negativo"],
+    required: [true, "El precio de venta es obligatorio"],
   },
   category: {
     type: String,

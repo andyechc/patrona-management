@@ -69,13 +69,10 @@ export async function Delete({url,setError,setIsLoading}: Delete) {
   setError("")
 
   fetch(url, {method: "DELETE"})
-  .then((res:Response) => {
+  .then(async (res:Response) => {
     if(res.ok){
-      res.json()
-      .then((data:[])=>{
-        console.log(data)
-        return
-      })
+      const data = res.status !== 204 ? await res.json() : null;
+      return data
     } else {
       setError(res.json().then(error => error.message + ` - #${res.status}`))
     }

@@ -2,7 +2,6 @@
 import CellActionButton from "@/components/data-table/cell-action-button";
 import { DataTable } from "@/components/data-table/data-table";
 import { Button } from "@/components/ui/button";
-import { Delete, GetAll, Put } from "@/utils/data-fetch";
 import { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -12,100 +11,43 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import ErrorMessage from "@/components/error-message";
-import Loading from "@/components/loading";
 import { z } from "zod";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { FormSchema } from "./add/warehouse-form";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { useCrudOperations } from "@/hooks/useCrudOperation";
+import { GenericForm } from "@/components/forms/generic-form";
+import { warehouseEditFormConfig, WarehouseFormSchema } from "@/components/forms/schemas/warehouse";
+import Link from "next/link";
 
 function WarehouseTable() {
-  const [data, setData] = useState([]);
-  const [products, setProducts] = useState([]);
-  const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const { data, error, fetchData, handleDelete, handleSubmit, isLoading } =
+    useCrudOperations("/api/warehouse");
   const [showEdit, setShowEdit] = useState(false);
   const [warehouseToUpdate, setWarehouseToUpdate] = useState({
+    _id: "",
     name: "",
-    price: 0,
+    productId: "",
+    purchasePrice: 0,
+    salePrice: 0,
     category: "",
     stock: 0,
-    total: 0,
-    _id: "",
   });
-
-  const form = useForm<z.infer<typeof FormSchema>>({
-    resolver: zodResolver(FormSchema),
-    defaultValues: {
-      product: "",
-      stock: 0,
-    },
-  });
-
-  const UpdateData = () => {
-    GetAll({
-      setData,
-      setError,
-      setIsLoading,
-      url: "/api/warehouse",
-    });
-  };
-
-  const handleDelete = async (id: string) => {
-    await Delete({
-      url: "/api/warehouse/" + id,
-      setError,
-      setIsLoading,
-    });
-    await UpdateData();
-  };
 
   const handleEdit = async (id: string) => {
     const warehouse = data.find((item: Product) => item._id === id);
-
+    console.log(warehouse)
+    
     if (warehouse) {
       setWarehouseToUpdate(warehouse);
       setShowEdit(true);
     }
   };
 
-  async function onSubmitEdit(data: z.infer<typeof FormSchema>) {
-    const { price, category, name } = JSON.parse(data.product);
-
-    await Put({
-      data: {
-        price,
-        category,
-        name,
-        stock: data.stock,
-      },
-      setError,
-      setIsLoading,
-      url: "/api/warehouse/" + warehouseToUpdate._id,
-    });
-
-    await UpdateData();
+  async function onSubmitEdit(data: z.infer<typeof WarehouseFormSchema>) {
+    const filterData = {stock: data.stock}
+    handleSubmit(filterData, warehouseToUpdate._id);
     setShowEdit(false);
   }
 
-  const columns: ColumnDef<Product>[] = [
+  const columns: ColumnDef<Warehouse>[] = [
     {
       accessorKey: "name",
       header: ({ column }) => (
@@ -120,17 +62,30 @@ function WarehouseTable() {
       cell: ({ row }) => <div>{row.getValue("name")}</div>,
     },
     {
-      accessorKey: "price",
+      accessorKey: "purchasePrice",
       header: ({ column }) => (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Precio
+          Precio de Compra
           <ArrowUpDown />
         </Button>
       ),
-      cell: ({ row }) => <div>${row.getValue("price")}</div>,
+      cell: ({ row }) => <div>${row.getValue("purchasePrice")}</div>,
+    },
+    {
+      accessorKey: "salePrice",
+      header: ({ column }) => (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Precio de Venta
+          <ArrowUpDown />
+        </Button>
+      ),
+      cell: ({ row }) => <div>${row.getValue("salePrice")}</div>,
     },
     {
       accessorKey: "category",
@@ -159,19 +114,6 @@ function WarehouseTable() {
       cell: ({ row }) => <div>{row.getValue("stock")}</div>,
     },
     {
-      accessorKey: "total",
-      header: ({ column }) => (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Total
-          <ArrowUpDown />
-        </Button>
-      ),
-      cell: ({ row }) => <div>{row.getValue("total")}</div>,
-    },
-    {
       id: "actions",
       enableHiding: false,
       cell: ({ row }) => {
@@ -187,13 +129,7 @@ function WarehouseTable() {
   ];
 
   useEffect(() => {
-    UpdateData();
-    GetAll({
-      setData: setProducts,
-      setError,
-      setIsLoading,
-      url: "/api/products",
-    });
+    fetchData();
   }, []);
 
   return (
@@ -216,89 +152,25 @@ function WarehouseTable() {
 
           <DialogContent className="sm:max-w-[425px]">
             <DialogTitle>Editar Ítem de Almacén</DialogTitle>
-            <Form {...form}>
-              {error && <ErrorMessage error={error} />}
-              {isLoading && <Loading />}
-              <form
-                onSubmit={form.handleSubmit(onSubmitEdit)}
-                className="w-2/3 space-y-6"
-              >
-                <FormField
-                  control={form.control}
-                  name="product"
-                  render={({ field }) => (
-                    <FormItem className="mt-3">
-                      <FormLabel>Producto</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Selecciona un Producto." />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {products &&
-                            products.map((product: Product) => (
-                              <SelectItem
-                                value={JSON.stringify(product)}
-                                key={product._id}
-                              >
-                                {product.name} - ${product.price}
-                              </SelectItem>
-                            ))}
-                        </SelectContent>
-                      </Select>
-                      <FormDescription>Este será el producto.</FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="stock"
-                  render={({ field }) => (
-                    <FormItem className="mt-3">
-                      <FormLabel>Cantidad</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="0"
-                          type="number"
-                          {...field}
-                          className="rounded"
-                          value={field.value ?? ""}
-                          onChange={(e) => {
-                            const value = e.target.value;
-                            if (value === "") {
-                              field.onChange(null);
-                            } else {
-                              const numberValue = Number(value);
-                              field.onChange(
-                                isNaN(numberValue) ? value : numberValue
-                              );
-                            }
-                          }}
-                        />
-                      </FormControl>
-                      <FormDescription>
-                        Este será la cantidad de este producto en el almacén
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <Button
-                  className="rounded cursor-pointer bg-red-900 text-red-300 mr-2 hover:bg-red-950"
-                  onClick={() => setShowEdit(false)}
-                >
-                  Cancelar
-                </Button>
-                <Button type="submit" className="rounded cursor-pointer">
-                  Aceptar
-                </Button>
-              </form>
-            </Form>
+
+            <GenericForm
+              defaultValues={warehouseToUpdate}
+              formConfig={warehouseEditFormConfig}
+              onCancelClick={() => setShowEdit(false)}
+              onSubmit={onSubmitEdit}
+              schema={WarehouseFormSchema}
+            >
+              <div>
+                <p>Nombre: {warehouseToUpdate.name}</p>
+                <p>Precio de compra: ${warehouseToUpdate.purchasePrice}</p>
+                <p>Precio de venta: ${warehouseToUpdate.salePrice}</p>
+                <p>Categoría: {warehouseToUpdate.category}</p>
+              </div>
+
+              <div>
+                <p className="text-accent-foreground/35 text-sm">Para cambiar estos valores, ve a la sección de <Link href={'/products'} className="underline text-blue-800">Productos</Link>.</p>
+              </div>
+            </GenericForm>
           </DialogContent>
         </Dialog>
       )}

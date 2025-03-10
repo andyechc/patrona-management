@@ -21,7 +21,9 @@ import {
 import { useState } from "react";
 import ErrorMessage from "../error-message";
 import TableSkeleton from "./table-skeleton";
-import { Button } from "../ui/button";
+import Link from "next/link";
+import LinkButton from "../link-button";
+import Loading from "../loading";
 
 export function DataTable<TData>({
   columns,
@@ -30,7 +32,7 @@ export function DataTable<TData>({
   searchPlaceholder = "Buscar...",
   isLoading = false,
   error = null,
-  addHref
+  addHref,
 }: DataTableProps<TData>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -60,9 +62,7 @@ export function DataTable<TData>({
           }
           className="max-w-xs rounded-[5px]"
         />
-        <a href={addHref}>
-          <Button variant={"default"} className="rounded cursor-pointer">Añadir</Button>
-        </a>
+        <LinkButton href={addHref}>Añadir</LinkButton>
       </div>
 
       <div className="rounded-[5px] border">
@@ -83,18 +83,7 @@ export function DataTable<TData>({
           </TableHeader>
 
           <TableBody>
-            {error ? (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center"
-                >
-                  <ErrorMessage error={error} />
-                </TableCell>
-              </TableRow>
-            ) : isLoading ? (
-              <TableSkeleton cells={columns.length} rows={3} />
-            ) : table.getRowModel().rows?.length ? (
+            {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow key={row.id}>
                   {row.getVisibleCells().map((cell) => (

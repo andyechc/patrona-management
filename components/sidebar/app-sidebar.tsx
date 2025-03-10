@@ -3,7 +3,6 @@ import {
   SidebarContent,
   SidebarFooter,
   SidebarGroup,
-  SidebarGroupAction,
   SidebarGroupContent,
   SidebarGroupLabel,
   SidebarHeader,
@@ -14,6 +13,7 @@ import {
 import options from "@/utils/sidebar-options";
 import Image from "next/image";
 import Logo from "@/public/logo.jpg";
+import Link from "next/link";
 
 export function AppSidebar() {
   return (
@@ -34,10 +34,10 @@ export function AppSidebar() {
             {option.isClickable ? (
               <SidebarMenuItem className="list-none">
                 <SidebarMenuButton asChild title={option.name}>
-                  <a href={option.href || ""}>
-                    {option.icon ? <option.icon /> : ""}
+                  <Link href={option.href || ""}>
+                    {option.icon ? option.icon : ""}
                     {option.name}
-                  </a>
+                  </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             ) : (
@@ -49,10 +49,10 @@ export function AppSidebar() {
                 {option.submenu?.map((menuOption) => (
                   <SidebarMenuItem key={menuOption.id}>
                     <SidebarMenuButton asChild>
-                      <a href={menuOption.href}>
+                      <Link href={menuOption.href}>
                         <menuOption.icon />
                         {menuOption.name}
-                      </a>
+                      </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 ))}

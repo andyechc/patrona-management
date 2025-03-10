@@ -1,13 +1,10 @@
-import RootLayout from "@/components/layout";
 import PageSection from "@/components/page-section";
-import ProductForm from "./product-form";
+import ProductAddForm from "./product-add-form";
 
-export default function ProductAddPage () {
-    return (
-    <RootLayout>
-      <PageSection title="Añade un nuevo producto">
-        <ProductForm/>
-      </PageSection>
-    </RootLayout>
+export default function ProductAddPage() {
+  return (
+    <PageSection title="Añade un nuevo producto">
+      <ProductAddForm/>
+    </PageSection>
   );
 }

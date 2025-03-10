@@ -5,7 +5,9 @@ import {
   UserRound,
   PanelsLeftBottom,
   CircleDollarSign,
-  NotebookTabs,
+  BadgeDollarSign,
+  Coins,
+  BookOpenTextIcon,
 } from "lucide-react";
 
 const options = [
@@ -68,12 +70,21 @@ const options = [
         isAction: false,
         isEditable: false,
         submenu: null,
+      },{
+        name: "Caja",
+        id: 3,
+        href: "/rooms",
+        icon: CircleDollarSign,
+        isClickable: true,
+        isAction: false,
+        isEditable: false,
+        submenu: null,
       },
       {
         name: "Facturas",
         id: 4,
         href: "/facturies",
-        icon: CircleDollarSign,
+        icon: BookOpenTextIcon,
         isClickable: true,
         isAction: false,
         isEditable: false,
@@ -99,17 +110,7 @@ const options = [
         isAction: false,
         isEditable: false,
         submenu: null,
-      },
-      {
-        name: "Categorías",
-        id: 2,
-        href: "/categories",
-        icon: NotebookTabs,
-        isClickable: true,
-        isAction: false,
-        isEditable: false,
-        submenu: null,
-      },
+      }
     ],
   },
 ];

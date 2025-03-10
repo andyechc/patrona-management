@@ -28,7 +28,7 @@ function CellActionButton({ handleDelete, handleEdit }: CellActionButtonProps) {
         </DropdownMenuItem>
 
         <DropdownMenuItem
-          className="p-3 hover:bg-red-900 hover:outline-0 text-red-300 flex items-center gap-2 cursor-pointer"
+          className="p-3 hover:bg-red-900 hover:outline-0 text-red-300 flex items-center gap-2 cursor-pointer rounded"
           onClick={handleDelete}
         >
           Eliminar

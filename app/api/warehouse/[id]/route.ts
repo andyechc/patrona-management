@@ -2,7 +2,7 @@ import Warehouse from "@/models/Warehouse";
 import { DeleteById, GetById, Put } from "@/utils/api/method-handler";
 
 // GET: Obtener producto por ID
-export async function GET(_: Request, { params }: { params: { id: string } }) {
+export async function GET(_: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   
   return await GetById({
@@ -14,25 +14,23 @@ export async function GET(_: Request, { params }: { params: { id: string } }) {
 // PUT: Actualizar producto
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
   const body:Warehouse = await request.json();
-  const total = body.price * body.stock
-  body.total = total
 
   return await Put({
     body,
     id,
     model: Warehouse,
-    allowedUpdates: ["name", "price", "category", "stock", "total"],
+    allowedUpdates: ["stock"],
   });
 }
 
 // DELETE: Eliminar producto
 export async function DELETE(
   _: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
 
