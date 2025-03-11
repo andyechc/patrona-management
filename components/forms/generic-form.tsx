@@ -10,8 +10,8 @@ export const GenericForm = ({
   defaultValues,
   onSubmit,
   formConfig,
-  onCancelClick,
-  selectData=[],
+  onCancelClick = undefined,
+  selectData = [],
   children,
 }: GenericFormProps) => {
   const form = useForm({
@@ -31,14 +31,18 @@ export const GenericForm = ({
             {...field}
           />
         ))}
-        <Button
-          className="bg-red-900 hover:bg-red-950 text-300 rounded cursor-pointer"
-          onClick={onCancelClick}
-          type="button"
-        >
-          Cancelar
+        {onCancelClick && (
+          <Button
+            className="bg-red-900 hover:bg-red-950 text-300 rounded cursor-pointer"
+            onClick={onCancelClick}
+            type="button"
+          >
+            Cancelar
+          </Button>
+        )}
+        <Button className="rounded cursor-pointer ml-2" type="submit">
+          Aceptar
         </Button>
-        <Button className="rounded cursor-pointer ml-2" type="submit">Aceptar</Button>
       </form>
     </Form>
   );

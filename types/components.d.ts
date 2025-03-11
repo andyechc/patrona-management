@@ -5,8 +5,8 @@ declare type PageSectionProps = {
 
 declare type ErrorMessageProps = {
   error: string;
-  className?: string,
-  setError?: Dispatch<SetStateAction>
+  className?: string;
+  onClose?: Dispatch<SetStateAction> | undefined;
 };
 
 declare type DataTableProps<TData> = {
@@ -17,30 +17,38 @@ declare type DataTableProps<TData> = {
   isLoading?: boolean;
   error?: string | null;
   pageSize?: number;
-  addHref: string
+  addHref: string;
 };
 
 declare type CellActionButtonProps = {
   handleDelete: MouseEventHandler<HTMLDivElement>;
   handleEdit: MouseEventHandler<HTMLDivElement>;
-}
+};
 
 declare type GenericFormProps = {
   schema: any;
   defaultValues: any;
   onSubmit: (data: any) => void;
   formConfig: FormFieldConfig[];
-  onCancelClick: MouseEventHandler;
+  onCancelClick?: MouseEventHandler | undefined;
   selectData?: Array;
   children?: React.ReactNode;
-}
+};
 
 declare type FormFieldConfig = {
   name: string;
   label: string;
-  type: "text" | "number" | "select";
+  type: "text" | "number" | "select" | "password";
   description?: string;
   placeholder?: string;
   step?: number;
   selectData?: Array;
+};
+
+declare type CurrencyInfoProps = {
+  primary: { amount: number; currency: string };
+  secondary: { amount: number; currency: string };
+  exchange: number;
+  password: string
+  id: string
 };

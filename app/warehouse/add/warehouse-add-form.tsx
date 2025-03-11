@@ -40,7 +40,7 @@ function WarehouseForm() {
       schema={WarehouseFormSchema}
       selectData={data}
     >
-      {error && <ErrorMessage error={error} setError={()=>setError("")}/>}
+      {error && <ErrorMessage error={error} />}
       {isLoading && <Loading />}
       {!error && !isLoading && isFinished && (
         <SuccessMessage

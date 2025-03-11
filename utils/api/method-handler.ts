@@ -138,7 +138,7 @@ export async function DeleteById({ model, id }: DeleteByIdMethod) {
       );
     }
 
-    return new NextResponse(data, { status: 200 });
+    return NextResponse.json(data, { status: 200 });
   } catch (error) {
     let message = "Error al eliminar";
     if (error instanceof Error) {

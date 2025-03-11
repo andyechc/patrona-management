@@ -12,8 +12,15 @@ import {
 } from "@/components/ui/sidebar";
 import options from "@/utils/sidebar-options";
 import Image from "next/image";
-import Logo from "@/public/logo.jpg";
+import Logo from "@/public/logo.svg";
 import Link from "next/link";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
+import { Button } from "../ui/button";
 
 export function AppSidebar() {
   return (
@@ -22,15 +29,14 @@ export function AppSidebar() {
         <Image
           alt="Logo con texto 'La Patrona'"
           src={Logo.src}
-          width={100}
-          height={100}
-          className="rounded-full"
+          width={120}
+          height={120}
         />
       </SidebarHeader>
 
       <SidebarContent>
         {options.map((option) => (
-          <SidebarGroup key={option.id}>
+          <SidebarGroup key={option.id} className="items-center">
             {option.isClickable ? (
               <SidebarMenuItem className="list-none">
                 <SidebarMenuButton asChild title={option.name}>
@@ -45,7 +51,7 @@ export function AppSidebar() {
             )}
 
             <SidebarGroupContent>
-              <SidebarMenu>
+              <SidebarMenu className="items-center">
                 {option.submenu?.map((menuOption) => (
                   <SidebarMenuItem key={menuOption.id}>
                     <SidebarMenuButton asChild>
@@ -62,7 +68,7 @@ export function AppSidebar() {
         ))}
       </SidebarContent>
 
-      <SidebarFooter></SidebarFooter>
+      <SidebarFooter className="items-center text-center"></SidebarFooter>
     </Sidebar>
   );
 }

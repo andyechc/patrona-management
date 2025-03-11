@@ -44,7 +44,7 @@ function ProductAddForm() {
       }}
       onCancelClick={() => router.back()}
     >
-      {error && <ErrorMessage error={error} setError={() => setError("")} />}
+      {error && <ErrorMessage error={error} onClose={() => setError("")} />}
       {isLoading && <Loading />}
       {!error && !isLoading && isFinished && (
         <SuccessMessage

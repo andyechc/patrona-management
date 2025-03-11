@@ -144,7 +144,7 @@ function ProductsTable() {
       {error && (
         <ErrorMessage
           error={error}
-          setError={() => setError("")}
+          onClose={() => setError("")}
           className="mt-2 m-auto"
         />
       )}

@@ -1,9 +1,19 @@
 import CashRegister from '@/models/CashRegister';
-import { getAll } from '@/utils/api/method-handler';
+import { getAll, Post } from '@/utils/api/method-handler';
+import { NextRequest } from 'next/server';
 
 export async function GET() {
   return await getAll({
     model: CashRegister,
-    sort: {name: -1}
+  })
+}
+
+export async function POST(request: NextRequest) {
+  const body = await request.json()
+  if (!body.password) body.password = btoa("000000")
+
+  return await Post({
+    model: CashRegister,
+    body
   })
 }

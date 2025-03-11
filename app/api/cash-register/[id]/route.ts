@@ -13,6 +13,6 @@ export async function PUT(
     body,
     id,
     model: CashRegister,
-    allowedUpdates: ["balances", "exchangeRate"],
+    allowedUpdates: ["balances", "exchangeRate", "password"],
   });
 }
