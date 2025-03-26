@@ -16,7 +16,7 @@ import ErrorMessage from "@/components/error-message";
 import Loading from "@/components/loading";
 import SuccessMessage from "@/components/success-mesage";
 import { Button } from "@/components/ui/button";
-import ChangeAmountForm from "./change-amount";
+import ChangeAmountForm from "./change-amount-form";
 import PasswordInput from "@/components/forms/password-input";
 import { useState } from "react";
 
@@ -33,7 +33,7 @@ function CurrencyInfo({
   const [showChangeAmout, setShowChangeAmount] = useState(false);
   const [showChangePass, setShowChangePass] = useState(false);
   const [isFinished, setIsFinished] = useState(false);
-  const [exchange, setExchange] = useState(defaultExchange);
+  const [exchange, setExchange] = useState(defaultExchange)
 
   function onSubmitAmount(data: z.infer<typeof ChangeAmountFormSchema>) {
     const cashregister = {
@@ -98,12 +98,12 @@ function CurrencyInfo({
   return (
     <div className="flex gap-3 items-center justify-between flex-wrap">
       <div className="flex gap-2">
-        <h2 className="text-5xl font-extrabold">{primary?.amount}</h2>
+        <h2 className="text-5xl font-extrabold font-mono">{primary?.amount}</h2>
         <p className="text-accent-foreground/50">{primary?.currency}</p>
       </div>
 
       <div className="flex gap-2">
-        <h2 className="text-5xl font-extrabold">{secondary?.amount}</h2>
+        <h2 className="text-5xl font-extrabold font-mono">{secondary?.amount}</h2>
         <p className="text-accent-foreground/50">{secondary?.currency}</p>
       </div>
 
@@ -221,14 +221,14 @@ function CurrencyInfo({
               <PasswordInput
                 label="Contraseña anterior"
                 name="oldpass"
-                placeholder="******"
-                options={{ maxLength: 6 }}
+                placeholder="****"
+                options={{ maxLength: 4 }}
               />
               <PasswordInput
                 label="Nueva contraseña"
                 name="newpass"
-                placeholder="******"
-                options={{ maxLength: 6 }}
+                placeholder="****"
+                options={{ maxLength: 4 }}
               />
               <div className="flex gap-2 items-center mt-5">
                 <Button

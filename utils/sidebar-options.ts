@@ -4,10 +4,9 @@ import {
   Apple,
   UserRound,
   PanelsLeftBottom,
-  CircleDollarSign,
-  BadgeDollarSign,
-  Coins,
   BookOpenTextIcon,
+  Logs,
+  KeySquare,
 } from "lucide-react";
 
 const options = [
@@ -42,7 +41,7 @@ const options = [
       },
       {
         name: "Facturas",
-        id: 4,
+        id: 3,
         href: "/facturies",
         icon: BookOpenTextIcon,
         isClickable: true,
@@ -54,7 +53,7 @@ const options = [
   },
   {
     name: "Gestión",
-    id: 3,
+    id: 2,
     href: null,
     icon: null,
     isClickable: false,
@@ -82,10 +81,10 @@ const options = [
         submenu: null,
       },
       {
-        name: "Caja",
+        name: "Administración",
         id: 3,
-        href: "/cash-register",
-        icon: CircleDollarSign,
+        href: "/admin",
+        icon: KeySquare,
         isClickable: true,
         isAction: false,
         isEditable: false,
@@ -95,7 +94,7 @@ const options = [
   },
   {
     name: "Nomencladores",
-    id: 4,
+    id: 3,
     href: null,
     icon: null,
     isClickable: false,
@@ -107,6 +106,27 @@ const options = [
         id: 1,
         href: "/products",
         icon: Apple,
+        isClickable: true,
+        isAction: false,
+        isEditable: false,
+        submenu: null,
+      },
+    ],
+  },
+  {
+    name: "Información",
+    id: 4,
+    href: null,
+    icon: null,
+    isClickable: false,
+    isAction: false,
+    isEditable: false,
+    submenu: [
+      {
+        name: "Registro Diario",
+        id: 1,
+        href: "/daily-logs",
+        icon: Logs,
         isClickable: true,
         isAction: false,
         isEditable: false,

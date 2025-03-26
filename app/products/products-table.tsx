@@ -20,6 +20,7 @@ import {
   ProductsFormSchema,
 } from "@/components/forms/schemas/product";
 import ErrorMessage from "@/components/error-message";
+import Loading from "@/components/loading";
 
 function ProductsTable() {
   const [showEdit, setShowEdit] = useState(false);
@@ -42,6 +43,7 @@ function ProductsTable() {
     purchasePrice: 0,
     salePrice: 0,
     category: "",
+    currency: "",
   });
 
   const handleEdit = async (id: string) => {
@@ -83,6 +85,19 @@ function ProductsTable() {
         </Button>
       ),
       cell: ({ row }) => <div>${row.getValue("purchasePrice")}</div>,
+    },
+    {
+      accessorKey: "currency",
+      header: ({ column }) => (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Moneda
+          <ArrowUpDown />
+        </Button>
+      ),
+      cell: ({ row }) => <div>{row.getValue("currency")}</div>,
     },
     {
       accessorKey: "salePrice",
@@ -136,8 +151,6 @@ function ProductsTable() {
         searchKey="name"
         searchPlaceholder="Buscar por nombre..."
         data={data}
-        error={error}
-        isLoading={isLoading}
         addHref="/products/add"
       />
 
@@ -149,13 +162,15 @@ function ProductsTable() {
         />
       )}
 
+      {isLoading && <Loading />}
+
       {showEdit && (
         <Dialog open>
           <DialogTrigger asChild>
             <Button variant="outline">Editar Producto</Button>
           </DialogTrigger>
 
-          <DialogContent className="sm:max-w-[425px]">
+          <DialogContent>
             <DialogTitle>Editar Producto</DialogTitle>
 
             <GenericForm
@@ -164,6 +179,10 @@ function ProductsTable() {
               onSubmit={onSubmitEdit}
               schema={ProductsFormSchema}
               onCancelClick={() => setShowEdit(false)}
+              selectData={[
+                { _id: "CUP", name: "CUP" },
+                { _id: "USD", name: "USD" },
+              ]}
             />
           </DialogContent>
         </Dialog>

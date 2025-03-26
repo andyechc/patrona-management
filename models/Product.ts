@@ -5,7 +5,6 @@ const productSchema = new Schema({
     type: String,
     required: [true, "El nombre es obligatorio"],
     trim: true,
-    unique: true,
   },
   purchasePrice: {
     type: Number,
@@ -21,6 +20,9 @@ const productSchema = new Schema({
     type: String,
     trim: true,
   },
+  currency: {
+    type: String,
+  }
 });
 
 const Product = mongoose.models.Product || model('Product', productSchema);

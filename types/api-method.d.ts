@@ -29,3 +29,7 @@ declare type DeleteByIdMethod = {
   id: string;
   model: Model<T>;
 }
+
+declare type DeleteAllMethod = {
+  model: Model<T>;
+}

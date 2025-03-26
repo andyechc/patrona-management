@@ -4,13 +4,15 @@ import { NextResponse } from "next/server";
 
 export async function cashregisterOperations(
   operation: "increment" | "discount",
-  amount: number
+  amount: number,
+  currency: string
 ) {
   const cashregister = await CashRegister.findOne();
-  let primaryAmount = cashregister.balances.primary.amount;
+  const balanceToOperate = currency === "USD" ? "primary" : "secondary";
+  let amountToOperate = cashregister.balances[balanceToOperate].amount;
 
   if (operation === "discount") {
-    if (cashregister && cashregister.balances.primary.amount < amount) {
+    if (cashregister && amountToOperate < amount) {
       return NextResponse.json(
         {
           success: false,
@@ -20,14 +22,15 @@ export async function cashregisterOperations(
         { status: 400 }
       );
     }
-    primaryAmount = primaryAmount - amount;
-    cashregister.balances.primary.amount = primaryAmount;
+
+    amountToOperate = amountToOperate - amount;
   }
 
   if (operation === "increment") {
-    primaryAmount = primaryAmount + amount;
-    cashregister.balances.primary.amount = primaryAmount;
+    amountToOperate = amountToOperate + amount;
   }
+
+  cashregister.balances[balanceToOperate].amount = amountToOperate;
 
   const newCashRegister = { balances: cashregister.balances };
   await Put({

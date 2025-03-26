@@ -20,10 +20,18 @@ import {
 } from "@/components/forms/schemas/warehouse";
 import Link from "next/link";
 import ErrorMessage from "@/components/error-message";
+import Loading from "@/components/loading";
 
 function WarehouseTable() {
-  const { data, error, setError, fetchData, handleDelete, handleSubmit, isLoading } =
-    useCrudOperations("/api/warehouse");
+  const {
+    data,
+    error,
+    setError,
+    fetchData,
+    handleDelete,
+    handleSubmit,
+    isLoading,
+  } = useCrudOperations("/api/warehouse");
   const [showEdit, setShowEdit] = useState(false);
   const [warehouseToUpdate, setWarehouseToUpdate] = useState({
     _id: "",
@@ -31,6 +39,7 @@ function WarehouseTable() {
     productId: "",
     purchasePrice: 0,
     salePrice: 0,
+    currency: "",
     category: "",
     stock: 0,
   });
@@ -76,6 +85,19 @@ function WarehouseTable() {
         </Button>
       ),
       cell: ({ row }) => <div>${row.getValue("purchasePrice")}</div>,
+    },
+    {
+      accessorKey: "currency",
+      header: ({ column }) => (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Moneda
+          <ArrowUpDown />
+        </Button>
+      ),
+      cell: ({ row }) => <div>{row.getValue("currency")}</div>,
     },
     {
       accessorKey: "salePrice",
@@ -142,8 +164,6 @@ function WarehouseTable() {
         searchKey="name"
         searchPlaceholder="Buscar por nombre..."
         data={data}
-        error={error}
-        isLoading={isLoading}
         addHref="/warehouse/add"
       />
 
@@ -154,6 +174,8 @@ function WarehouseTable() {
           className="mt-2 m-auto"
         />
       )}
+
+      {isLoading && <Loading />}
 
       {showEdit && (
         <Dialog open>
@@ -171,14 +193,15 @@ function WarehouseTable() {
               onSubmit={onSubmitEdit}
               schema={WarehouseFormSchema}
             >
-              <div>
+              <div className="col-span-3">
                 <p>Nombre: {warehouseToUpdate.name}</p>
                 <p>Precio de compra: ${warehouseToUpdate.purchasePrice}</p>
                 <p>Precio de venta: ${warehouseToUpdate.salePrice}</p>
+                <p>Moneda: {warehouseToUpdate.currency}</p>
                 <p>Categoría: {warehouseToUpdate.category}</p>
               </div>
 
-              <div>
+              <div className="col-span-3">
                 <p className="text-accent-foreground/35 text-sm">
                   Para cambiar estos valores, ve a la sección de{" "}
                   <Link href={"/products"} className="underline text-blue-800">

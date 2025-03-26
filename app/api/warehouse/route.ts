@@ -2,6 +2,7 @@ import dbConnect from "@/lib/mongodbConnect";
 import Product from "@/models/Product";
 import Warehouse from "@/models/Warehouse";
 import { cashregisterOperations } from "@/services/cashregister-operations";
+import { dailyLogOperations } from "@/services/daily-log-operation";
 import { Post } from "@/utils/api/method-handler";
 import { NextResponse } from "next/server";
 
@@ -27,6 +28,7 @@ export async function GET() {
           purchasePrice: "$product.purchasePrice",
           salePrice: "$product.salePrice",
           category: "$product.category",
+          currency: "$product.currency"
         },
       },
     ]);
@@ -44,10 +46,18 @@ export async function GET() {
 export async function POST(request: Request) {
   const body: Warehouse = await request.json();
 
-  const { purchasePrice } = await Product.findOne({ _id: body.productId });
+  const { purchasePrice, name, currency } = await Product.findOne({
+    _id: body.productId,
+  });
   const amountToDiscount = body.stock * purchasePrice;
 
-  cashregisterOperations("discount", amountToDiscount)
+  await dailyLogOperations({
+    title: "Nuevo Producto en Almacén",
+    description: `Se realizó una nueva compra y se añadió ${body.stock} ${name} al almacén. Esto ocasionó una pérdida de $${amountToDiscount} ${currency}.`,
+    type: "losses",
+  });
+
+  await cashregisterOperations("discount", amountToDiscount, currency);
 
   return await Post({
     body,

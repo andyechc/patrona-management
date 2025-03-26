@@ -1,4 +1,5 @@
 "use client";
+import { cn } from "@/lib/utils";
 import {
   FormControl,
   FormDescription,
@@ -8,7 +9,14 @@ import {
   FormMessage,
 } from "../ui/form";
 import { Input } from "../ui/input";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
 
 export const DynamicFormField = ({
   control,
@@ -18,14 +26,15 @@ export const DynamicFormField = ({
   placeholder,
   description,
   step,
-  selectData=[],
+  selectData = [],
+  colspan = 1,
 }: FormFieldConfig & { control: any }) => {
   return (
     <FormField
       control={control}
       name={name}
       render={({ field }) => (
-        <FormItem className="mt-3">
+        <FormItem className={`mt-3 col-span-${colspan}`}>
           <FormLabel>{label}</FormLabel>
           <FormControl>
             {type === "number" ? (
@@ -48,19 +57,49 @@ export const DynamicFormField = ({
               />
             ) : type === "select" ? (
               <Select onValueChange={field.onChange} value={field.value}>
-                <SelectTrigger className="w-fit">
-                  <SelectValue placeholder={placeholder}/>
+                <SelectTrigger className="w-fit rounded">
+                  <SelectValue placeholder={placeholder} />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="rounded">
                   <SelectGroup>
-                    {selectData.map((item: {_id:string, name:string}) => (
-                      <SelectItem value={item._id} key={item._id}>{item.name}</SelectItem>
-                    ))}
+                    {selectData.length > 0 &&
+                      selectData.map((item: any) => (
+                        <SelectItem
+                          value={item._id}
+                          key={item._id}
+                          className="rounded"
+                        >
+                          {item.name}{" "}
+                          {item.purchasePrice &&
+                            "- Compra: $" +
+                              item.purchasePrice +
+                              " Moneda: " +
+                              item.currency +
+                              " Venta: $" +
+                              item.salePrice}
+                        </SelectItem>
+                      ))}
                   </SelectGroup>
                 </SelectContent>
               </Select>
+            ) : type === "textarea" ? (
+              <textarea
+                className={cn(
+                  "border-input placeholder:text-muted-foreground flex h-14 w-full min-w-0 rounded border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none md:text-sm resize-none",
+                  "focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]",
+                  "aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive"
+                )}
+                placeholder={placeholder}
+                {...field}
+                value={field.value ?? ""}
+              ></textarea>
             ) : (
-              <Input className="rounded" {...field} placeholder={placeholder} value={field.value ?? ""}/>
+              <Input
+                className="rounded"
+                {...field}
+                placeholder={placeholder}
+                value={field.value ?? ""}
+              />
             )}
           </FormControl>
           {description && <FormDescription>{description}</FormDescription>}

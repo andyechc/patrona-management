@@ -10,7 +10,7 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   const body = await request.json()
-  if (!body.password) body.password = btoa("000000")
+  if (!body.password) body.password = btoa("0000")
 
   return await Post({
     model: CashRegister,

@@ -1,7 +1,6 @@
 import CashRegister from "@/models/CashRegister";
 import { Put } from "@/utils/api/method-handler";
 
-// PUT: Actualizar CashRegistero
 export async function PUT(
   request: Request,
   { params }: { params: Promise<{ id: string }> }

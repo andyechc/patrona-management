@@ -28,6 +28,7 @@ function SuccessMessage({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogAction
+            autoFocus={true}
             onClick={handleConfirm}
             className="rounded bg-green-900 text-green-300 hover:bg-green-950"
           >

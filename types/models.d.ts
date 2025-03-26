@@ -4,6 +4,7 @@ declare type Product = {
   purchasePrice: number;
   salePrice: number;
   category: string;
+  currency: string;
 };
 
 declare type Warehouse = {
@@ -27,3 +28,18 @@ declare type CashRegister = {
     };
   };
 };
+
+declare type DailyLog = {
+  _id: string;
+  title: string;
+  description: string;
+  type: "gains" | "losses" | "warn" | "info";
+  date: string;
+};
+
+declare type Room = {
+  _id: string,
+  name: string,
+  inventary: Array;
+  products: Array;
+}

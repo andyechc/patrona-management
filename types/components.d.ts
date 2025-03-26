@@ -14,10 +14,9 @@ declare type DataTableProps<TData> = {
   data: TData[];
   searchKey: string;
   searchPlaceholder?: string;
-  isLoading?: boolean;
-  error?: string | null;
   pageSize?: number;
   addHref: string;
+  actionComponents?: React.ReactNode
 };
 
 declare type CellActionButtonProps = {
@@ -32,23 +31,26 @@ declare type GenericFormProps = {
   formConfig: FormFieldConfig[];
   onCancelClick?: MouseEventHandler | undefined;
   selectData?: Array;
+  gridcols?: number;
   children?: React.ReactNode;
 };
 
 declare type FormFieldConfig = {
   name: string;
   label: string;
-  type: "text" | "number" | "select" | "password";
+  type: "text" | "number" | "select" | "password" | "textarea";
   description?: string;
   placeholder?: string;
   step?: number;
   selectData?: Array;
+  colspan?: number;
+  required?: boolean;
 };
 
 declare type CurrencyInfoProps = {
   primary: { amount: number; currency: string };
   secondary: { amount: number; currency: string };
   exchange: number;
-  password: string
-  id: string
+  password: string;
+  id: string;
 };

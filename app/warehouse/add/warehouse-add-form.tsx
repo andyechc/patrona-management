@@ -39,6 +39,7 @@ function WarehouseForm() {
       onSubmit={onSubmit}
       schema={WarehouseFormSchema}
       selectData={data}
+      gridcols={5}
     >
       {error && <ErrorMessage error={error} />}
       {isLoading && <Loading />}

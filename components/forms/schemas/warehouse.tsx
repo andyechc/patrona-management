@@ -14,13 +14,15 @@ export const warehouseFormConfig: FormFieldConfig[] = [
     type: "select",
     description: "El producto que decea enviar al Almacén",
     placeholder: "Seleciona un producto",
+    colspan: 3
   },{
     name: "stock",
     label: "Cantidad",
     type: "number",
     step: 1,
     description: "Cantidad de este producto en el Almacén",
-    placeholder: "0"
+    placeholder: "0",
+    colspan: 2
   },
 ];
 
@@ -31,6 +33,7 @@ export const warehouseEditFormConfig: FormFieldConfig[] = [
     type: "number",
     step: 1,
     description: "Cantidad de este producto en el Almacén",
-    placeholder: "0"
+    placeholder: "0",
+    colspan: 3
   },
 ];

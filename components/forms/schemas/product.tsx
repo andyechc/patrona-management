@@ -1,9 +1,12 @@
 import { z } from "zod";
 
 export const ProductsFormSchema = z.object({
-  name: z.string().min(2, {
-    message: "El Nombre debe tener al menos 2 caracteres.",
-  }).trim(),
+  name: z
+    .string()
+    .min(2, {
+      message: "El Nombre debe tener al menos 2 caracteres.",
+    })
+    .trim(),
   purchasePrice: z
     .number()
     .nonnegative("El precio de compra no puede ser negativo")
@@ -12,9 +15,13 @@ export const ProductsFormSchema = z.object({
     .number()
     .nonnegative("El precio de venta no puede ser negativo")
     .min(0.01, { message: "El precio de venta minimo es 0.01" }),
-  category: z.string().min(2, {
-    message: "La categoria debe tener al menos 2 caracteres.",
-  }).trim(),
+  category: z
+    .string()
+    .min(2, {
+      message: "La categoria debe tener al menos 2 caracteres.",
+    })
+    .trim(),
+  currency: z.string(),
 });
 
 export type ProductFormValues = z.infer<typeof ProductsFormSchema>;
@@ -25,7 +32,7 @@ export const productsFormConfig: FormFieldConfig[] = [
     label: "Nombre",
     type: "text",
     description: "Nombre visible del producto",
-    placeholder: "Nombre"
+    placeholder: "Nombre",
   },
   {
     name: "purchasePrice",
@@ -33,7 +40,14 @@ export const productsFormConfig: FormFieldConfig[] = [
     type: "number",
     step: 0.01,
     description: "Precio por el cual fue comprado el producto.",
-    placeholder: "0.00"
+    placeholder: "0.00",
+  },
+  {
+    name: "currency",
+    label: "Moneda",
+    type: "select",
+    description: "Tipo de Moneda para Precio de Compras.",
+    placeholder: "Selecciona la Moneda",
   },
   {
     name: "salePrice",
@@ -41,13 +55,13 @@ export const productsFormConfig: FormFieldConfig[] = [
     type: "number",
     step: 0.01,
     description: "Precio por el cual será vendido el producto.",
-    placeholder: "0.00"
+    placeholder: "0.00",
   },
   {
     name: "category",
     label: "Categoría",
     type: "text",
     description: "Categoría que agrupa a este producto.",
-    placeholder: "Categoría"
+    placeholder: "Categoría",
   },
 ];

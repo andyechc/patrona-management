@@ -17,14 +17,12 @@ function PassPage({
     <PageSection title="Acceso Limitado">
       <div className="flex flex-col gap-2 justify-center items-center h-[300px]">
         <h2 className="font-bold">Introduce la Contraseña</h2>
-        <InputOTP maxLength={6} value={pass} onChange={(pass) => setPass(pass)}>
+        <InputOTP maxLength={4} value={pass} onChange={(pass) => setPass(pass)}>
           <InputOTPGroup>
             <InputOTPSlot index={0} />
             <InputOTPSlot index={1} />
             <InputOTPSlot index={2} />
             <InputOTPSlot index={3} />
-            <InputOTPSlot index={4} />
-            <InputOTPSlot index={5} />
           </InputOTPGroup>
         </InputOTP>
       </div>

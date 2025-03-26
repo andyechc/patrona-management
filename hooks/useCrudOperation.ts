@@ -1,19 +1,20 @@
 import { useState } from "react";
-import { GetAll, Delete, Put, Post } from "@/utils/data-fetch";
+import { GetAll, Delete, Put, Post, GetById } from "@/utils/data-fetch";
 
 export const useCrudOperations = (endpoint: string) => {
   const [data, setData] = useState([]);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const fetchData = () => {
-    GetAll({ url: endpoint, setData, setError, setIsLoading });
+  const fetchData = (id="") => {
+    if (id)
+      GetById({ url: `${endpoint}/${id}`, setData, setError, setIsLoading });
+    else GetAll({ url: endpoint, setData, setError, setIsLoading });
   };
 
   const handleDelete = (id: string) => {
-    Delete({ url: `${endpoint}/${id}`, setError, setIsLoading }).then(
-      fetchData
-    );
+    const url = id ? `${endpoint}/${id}` : endpoint;
+    Delete({ url, setError, setIsLoading }).then(()=>fetchData);
   };
 
   const handleSubmit = (values: any, id?: string) => {
@@ -21,7 +22,7 @@ export const useCrudOperations = (endpoint: string) => {
       ? Put({ url: `${endpoint}/${id}`, data: values, setError, setIsLoading })
       : Post({ url: endpoint, data: values, setError, setIsLoading });
 
-    operation.then(fetchData);
+    operation.then(()=>fetchData);
   };
 
   return {

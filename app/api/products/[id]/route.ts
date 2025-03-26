@@ -1,12 +1,16 @@
 import dbConnect from "@/lib/mongodbConnect";
 import Product from "@/models/Product";
 import Warehouse from "@/models/Warehouse";
+import { dailyLogOperations } from "@/services/daily-log-operation";
 import { GetById, Put } from "@/utils/api/method-handler";
 import { isValidObjectId } from "mongoose";
 import { NextResponse } from "next/server";
 
 // GET: Obtener producto por ID
-export async function GET(_: Request, { params }: { params: Promise<{ id: string }> }) {
+export async function GET(
+  _: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
   const { id } = await params;
 
   return await GetById({
@@ -23,11 +27,18 @@ export async function PUT(
   const { id } = await params;
   const body: Product = await request.json();
 
+  const oldProduct = await Product.findOne({ _id: id });
+  dailyLogOperations({
+    title: "Cambio de datos de un Producto",
+    description: `Se cambiaron los datos del siguiente producto de almacén: nombre: ${oldProduct?.name}, precio de compra: ${oldProduct.purchasePrice}, precio de venta: ${oldProduct.salePrice}, moneda: ${oldProduct.currency} y categoría: ${oldProduct.category}. Ahora sus valores son: nombre: ${body?.name}, precio de compra: ${body.purchasePrice}, precio de venta: ${body.salePrice}, moneda: ${body.currency} y categoría: ${body.category}. Esto puede traer consecuencias.`,
+    type: "warn",
+  });
+
   return await Put({
     body,
     id,
     model: Product,
-    allowedUpdates: ["name", "purchasePrice", "salePrice", "category"],
+    allowedUpdates: ["name", "purchasePrice", "salePrice", "category", "currency"],
   });
 }
 
@@ -51,9 +62,10 @@ export async function DELETE(
     const warehouseItems = await Warehouse.find({ productId: id });
     if (warehouseItems.length > 0) {
       return NextResponse.json(
-        { 
-          success: false, 
-          message: "No se puede eliminar el producto. Primero elimine sus registros en el almacén." 
+        {
+          success: false,
+          message:
+            "No se puede eliminar el producto. Primero elimine sus registros en el almacén.",
         },
         { status: 400 }
       );
@@ -74,9 +86,6 @@ export async function DELETE(
     if (error instanceof Error) {
       message += ": " + error.message;
     }
-    return NextResponse.json(
-      { success: false, message },
-      { status: 500 }
-    );
+    return NextResponse.json({ success: false, message }, { status: 500 });
   }
 }

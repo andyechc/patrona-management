@@ -20,6 +20,29 @@ export async function GetAll({url,setData,setError,setIsLoading}: Get) {
   .finally(setIsLoading(false))
 }
 
+export async function GetById({url,setData,setError,setIsLoading}: Get) {
+  setIsLoading(true)
+  setError("")
+
+  fetch(url)
+  .then((res:Response) => {
+    if(res.ok){
+      res.json()
+      .then((data:object)=>{
+        setData(data)
+        return
+      })
+    } else {
+      setError(res.json().then(error => error.message + ` - #${res.status}`))
+    }
+  })
+  .catch((error) => {
+    setError(error.message)
+  })
+  .finally(setIsLoading(false))
+}
+
+
 export async function Post({data, url,setError,setIsLoading}: Post) {
   setIsLoading(true)
   setError("")

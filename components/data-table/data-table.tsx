@@ -19,20 +19,16 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useState } from "react";
-import ErrorMessage from "../error-message";
-import TableSkeleton from "./table-skeleton";
-import Link from "next/link";
 import LinkButton from "../link-button";
-import Loading from "../loading";
+import { Plus } from "lucide-react";
 
 export function DataTable<TData>({
   columns,
   data,
   searchKey,
   searchPlaceholder = "Buscar...",
-  isLoading = false,
-  error = null,
   addHref,
+  actionComponents,
 }: DataTableProps<TData>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -62,12 +58,18 @@ export function DataTable<TData>({
           }
           className="max-w-xs rounded-[5px]"
         />
-        <LinkButton href={addHref}>Añadir</LinkButton>
+        <div className="flex gap-2">
+          {actionComponents}
+          <LinkButton href={addHref}>
+            <Plus />
+            Añadir
+          </LinkButton>
+        </div>
       </div>
 
-      <div className="rounded-[5px] border">
+      <div className="rounded-[5px] border ">
         <Table>
-          <TableHeader>
+          <TableHeader className="sticky top-0 left-0 z-10">
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (

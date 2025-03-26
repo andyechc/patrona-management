@@ -12,10 +12,7 @@ export async function getAll({ model, sort }: GetAllMethod) {
     if (error instanceof Error) {
       message += ": " + error.message;
     }
-    return NextResponse.json(
-      { success: false, message },
-      { status: 500 }
-    );
+    return NextResponse.json({ success: false, message }, { status: 500 });
   }
 }
 
@@ -29,10 +26,7 @@ export async function Post({ body, model }: PostMethod) {
     if (error instanceof Error) {
       message += ": " + error.message;
     }
-    return NextResponse.json(
-      { success: false, message },
-      { status: 500 }
-    );
+    return NextResponse.json({ success: false, message }, { status: 500 });
   }
 }
 
@@ -62,10 +56,7 @@ export async function GetById({ model, id }: GetByIdMethod) {
     if (error instanceof Error) {
       message += ": " + error.message;
     }
-    return NextResponse.json(
-      { success: false, message },
-      { status: 500 }
-    );
+    return NextResponse.json({ success: false, message }, { status: 500 });
   }
 }
 
@@ -79,7 +70,7 @@ export async function Put({ body, id, model, allowedUpdates }: PutMethod) {
         { status: 400 }
       );
     }
-    
+
     // Validar campos permitidos
     const updates = Object.keys(body);
     const isValidOperation = updates.every((update) =>
@@ -111,10 +102,7 @@ export async function Put({ body, id, model, allowedUpdates }: PutMethod) {
     if (error instanceof Error) {
       message += ": " + error.message;
     }
-    return NextResponse.json(
-      { success: false, message },
-      { status: 500 }
-    );
+    return NextResponse.json({ success: false, message }, { status: 500 });
   }
 }
 
@@ -144,9 +132,29 @@ export async function DeleteById({ model, id }: DeleteByIdMethod) {
     if (error instanceof Error) {
       message += ": " + error.message;
     }
-    return NextResponse.json(
-      { success: false, message },
-      { status: 500 }
-    );
+    return NextResponse.json({ success: false, message }, { status: 500 });
+  }
+}
+
+export async function DeleteAll({ model }: DeleteAllMethod) {
+  try {
+    await dbConnect();
+
+    const data = await model.deleteMany();
+
+    if (!data) {
+      return NextResponse.json(
+        { success: false, message: "Error: no encontrado" },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json(data, { status: 200 });
+  } catch (error) {
+    let message = "Error al eliminar";
+    if (error instanceof Error) {
+      message += ": " + error.message;
+    }
+    return NextResponse.json({ success: false, message }, { status: 500 });
   }
 }

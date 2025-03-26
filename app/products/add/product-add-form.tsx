@@ -21,14 +21,8 @@ function ProductAddForm() {
 
   async function onSubmit(data: z.infer<typeof ProductsFormSchema>) {
     setIsFinished(false);
-
-    if (data.purchasePrice > data.salePrice) {
-      setError("El precio de venta no puede ser menor al precio de compra");
-      return;
-    } else {
-      handleSubmit(data);
-      setIsFinished(true);
-    }
+    handleSubmit(data);
+    setIsFinished(true);
   }
 
   return (
@@ -38,11 +32,16 @@ function ProductAddForm() {
       schema={ProductsFormSchema}
       defaultValues={{
         name: "",
-        purchasePrice: 0,
-        salePrice: 0,
+        purchasePrice: undefined,
+        salePrice: undefined,
         category: "",
+        currency: "",
       }}
       onCancelClick={() => router.back()}
+      selectData={[
+        { _id: "CUP", name: "CUP" },
+        { _id: "USD", name: "USD" },
+      ]}
     >
       {error && <ErrorMessage error={error} onClose={() => setError("")} />}
       {isLoading && <Loading />}
