@@ -12,7 +12,7 @@ export const GenericForm = ({
   formConfig,
   onCancelClick = undefined,
   selectData = [],
-  gridcols=3,
+  gridcols = 3,
   children,
 }: GenericFormProps) => {
   const form = useForm({
@@ -26,7 +26,6 @@ export const GenericForm = ({
         onSubmit={form.handleSubmit(onSubmit)}
         className={`w-full grid gap-4 grid-cols-${gridcols}`}
       >
-        {children}
         {formConfig.map((field) => (
           <DynamicFormField
             key={field.name}
@@ -35,6 +34,9 @@ export const GenericForm = ({
             {...field}
           />
         ))}
+
+        {children}
+        
         <div className="col-span-3 mt-5">
           {onCancelClick && (
             <Button

@@ -46,6 +46,34 @@ export const inventaryFormConfig: FormFieldConfig[] = [
     name: "stock",
     label: "Cantidad",
     type: "number",
+    step: 1,
+    description: "Cantidad que existe en la Habitación",
+    placeholder: "0",
+  },
+];
+
+//Inventary
+export const ProductsFormSchema = z.object({
+  productId: z.string(),
+  stock: z.number().min(1, "La cantidad mínima es 1"),
+});
+
+export type ProductsFormValues = z.infer<typeof ProductsFormSchema>;
+
+export const productFormConfig: FormFieldConfig[] = [
+  {
+    name: "productId",
+    label: "Producto de Almacén",
+    type: "select",
+    description: "Seleciona un producto existente en el almacén, para incorporarlo a esta habitación.",
+    placeholder: "Selecciona un producto.",
+    colspan: 3
+  },
+  {
+    name: "stock",
+    label: "Cantidad",
+    type: "number",
+    step: 1,
     description: "Cantidad que existe en la Habitación",
     placeholder: "0",
   },

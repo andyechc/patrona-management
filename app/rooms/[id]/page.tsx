@@ -40,10 +40,16 @@ function DetailRoomPage() {
       <div className="flex items-center flex-wrap gap-4">
         <div className="flex flex-col flex-grow">
           <p className="text-xl text-accent-foreground font-thin">Inventario</p>
-          <InventaryTable inventary={room.inventary} id={room._id}/>
+          <InventaryTable
+            inventary={room.inventary}
+            id={room._id}
+            handleSubmit={handleSubmit}
+            updateDetails={() => fetchData(id)}
+          />
         </div>
+
         <div className="flex flex-col flex-grow">
-        <p className="text-xl text-accent-foreground font-thin">Productos</p>
+          <p className="text-xl text-accent-foreground font-thin">Productos</p>
         </div>
       </div>
     </PageSection>

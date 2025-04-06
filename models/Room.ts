@@ -6,12 +6,21 @@ const roomSchema = new Schema({
     required: [true, "El nombre es obligatorio"],
     trim: true,
   },
-  inventary: {
-    type: Array,
-  },
-  products: {
-    type: Array
-  }
+  inventary: [
+    {
+      name: String,
+      stock: Number,
+    }
+  ],
+  products: [
+    {
+      product: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Product',
+      },
+      stock: Number
+    }
+  ]
 });
 
 const Room = mongoose.models.Room || model('Room', roomSchema);

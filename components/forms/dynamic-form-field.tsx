@@ -65,7 +65,7 @@ export const DynamicFormField = ({
                     {selectData.length > 0 &&
                       selectData.map((item: any) => (
                         <SelectItem
-                          value={item._id}
+                          value={item.productId || item._id}
                           key={item._id}
                           className="rounded"
                         >
@@ -77,6 +77,7 @@ export const DynamicFormField = ({
                               item.currency +
                               " Venta: $" +
                               item.salePrice}
+                          {item.stock && " Cantidad: " + item.stock}
                         </SelectItem>
                       ))}
                   </SelectGroup>
