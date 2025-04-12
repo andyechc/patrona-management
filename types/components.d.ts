@@ -16,7 +16,7 @@ declare type DataTableProps<TData> = {
   searchPlaceholder?: string;
   pageSize?: number;
   addHref: string;
-  actionComponents?: React.ReactNode
+  actionComponents?: React.ReactNode;
 };
 
 declare type CellActionButtonProps = {
@@ -38,7 +38,7 @@ declare type GenericFormProps = {
 declare type FormFieldConfig = {
   name: string;
   label: string;
-  type: "text" | "number" | "select" | "password" | "textarea";
+  type: "text" | "number" | "select" | "password" | "textarea" | "email";
   description?: string;
   placeholder?: string;
   step?: number;

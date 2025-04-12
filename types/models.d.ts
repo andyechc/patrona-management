@@ -38,8 +38,16 @@ declare type DailyLog = {
 };
 
 declare type Room = {
-  _id: string,
-  name: string,
+  _id: string;
+  name: string;
   inventary: Array;
   products: Array;
-}
+};
+declare type Client = {
+  _id: string;
+  name: string;
+  email?: string;
+  phone?: number;
+  dni?: string;
+  status: "activo" | "inactivo";
+};
