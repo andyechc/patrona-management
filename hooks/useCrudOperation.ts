@@ -6,7 +6,7 @@ export const useCrudOperations = (endpoint: string) => {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const fetchData = (id="") => {
+  const fetchData = (id = "") => {
     if (id)
       GetById({ url: `${endpoint}/${id}`, setData, setError, setIsLoading });
     else GetAll({ url: endpoint, setData, setError, setIsLoading });
@@ -14,7 +14,7 @@ export const useCrudOperations = (endpoint: string) => {
 
   const handleDelete = (id: string) => {
     const url = id ? `${endpoint}/${id}` : endpoint;
-    Delete({ url, setError, setIsLoading }).then(()=>fetchData);
+    Delete({ url, setError, setIsLoading }).then(() => fetchData);
   };
 
   const handleSubmit = (values: any, id?: string) => {
@@ -22,7 +22,7 @@ export const useCrudOperations = (endpoint: string) => {
       ? Put({ url: `${endpoint}/${id}`, data: values, setError, setIsLoading })
       : Post({ url: endpoint, data: values, setError, setIsLoading });
 
-    operation.then(()=>fetchData);
+    operation.then(() => fetchData);
   };
 
   return {
