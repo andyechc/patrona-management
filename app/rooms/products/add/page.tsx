@@ -9,8 +9,6 @@ import Loading from "@/components/loading";
 import SuccessMessage from "@/components/success-mesage";
 import { useEffect, useState } from "react";
 import {
-  inventaryFormConfig,
-  InventaryFormSchema,
   productFormConfig,
   ProductsFormSchema,
 } from "@/components/forms/schemas/room";

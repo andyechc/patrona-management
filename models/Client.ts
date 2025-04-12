@@ -15,6 +15,12 @@ const client = new Schema({
     type: String,
     unique: true,
   },
+  services: {
+    type: Array,
+  },
+  consume: {
+    type: Array,
+  },
   status: {
     type: String,
     enum: ["activo", "inactivo"],

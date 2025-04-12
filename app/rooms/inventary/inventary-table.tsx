@@ -57,7 +57,7 @@ function InventaryTable({
     setshowEdit(false);
   };
 
-  const handleDelete = (i: number) => {
+  const handleDelete = () => {
     const filterInventary = inventary.filter(
       (_item, i) => i !== itemToEdit.index,
     );
