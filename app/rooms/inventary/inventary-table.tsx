@@ -48,7 +48,7 @@ function InventaryTable({
 
   const submitEdit = async (data: z.infer<typeof InventaryFormSchema>) => {
     const filterInventary = inventary.filter(
-      (_item, i) => i !== itemToEdit.index
+      (_item, i) => i !== itemToEdit.index,
     );
     filterInventary.push(data);
 
@@ -58,9 +58,8 @@ function InventaryTable({
   };
 
   const handleDelete = (i: number) => {
-    const itemFound = inventary.find((_item, index) => index === i);
     const filterInventary = inventary.filter(
-      (_item, i) => i !== itemToEdit.index
+      (_item, i) => i !== itemToEdit.index,
     );
 
     handleSubmit({ inventary: filterInventary }, id);
@@ -114,7 +113,7 @@ function InventaryTable({
         columns={columns}
         searchKey="name"
         searchPlaceholder="Buscar por nombre..."
-        data={inventary}
+        data={inventary || []}
         addHref={"/rooms/inventary/add?id=" + id}
       />
 

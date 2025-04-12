@@ -34,7 +34,6 @@ function RoomTable() {
         </Link>
       ),
     },
-    
   ];
 
   useEffect(() => {
@@ -55,7 +54,7 @@ function RoomTable() {
         <ErrorMessage
           error={error}
           onClose={() => setError("")}
-          className="mt-2 m-auto"
+          className="mt-2 m-auto "
         />
       )}
 

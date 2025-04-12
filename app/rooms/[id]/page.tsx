@@ -6,6 +6,7 @@ import { useCrudOperations } from "@/hooks/useCrudOperation";
 import { useParams } from "next/navigation";
 import { useEffect } from "react";
 import InventaryTable from "../inventary/inventary-table";
+import ProductsTable from "@/app/rooms/products/products-table";
 
 function DetailRoomPage() {
   const { id } = useParams();
@@ -18,7 +19,7 @@ function DetailRoomPage() {
     isLoading,
     setError,
   }: any = useCrudOperations("/api/rooms");
-  const room: Room = data.data;
+  const room: Room = data;
 
   useEffect(() => {
     fetchData(id);
@@ -50,6 +51,12 @@ function DetailRoomPage() {
 
         <div className="flex flex-col flex-grow">
           <p className="text-xl text-accent-foreground font-thin">Productos</p>
+          <ProductsTable
+            id={room._id}
+            handleSubmit={handleSubmit}
+            updateDetails={() => fetchData(id)}
+            products={room.products}
+          />
         </div>
       </div>
     </PageSection>
