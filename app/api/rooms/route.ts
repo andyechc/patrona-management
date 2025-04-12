@@ -8,7 +8,10 @@ import { NextResponse } from "next/server";
 export async function GET() {
   try {
     await dbConnect();
-    const data = await Room.find().populate("products.product").exec();
+    const data = await Room.find().populate({
+      path: "products.product",
+      model: "Product",
+    });
 
     return NextResponse.json(data);
   } catch (error) {
@@ -48,10 +51,9 @@ export async function POST(request: Request) {
 
   const { products } = body;
 
-  products.forEach(async (prod: any) => {
-    console.log(prod.productId)
+  for (const prod of products) {
     const warehouseReference = warehouses.find(
-      (item:any) => item.productId.toString() === prod.productId
+      (item: any) => item.productId.toString() === prod.product,
     );
 
     await Put({
@@ -60,7 +62,7 @@ export async function POST(request: Request) {
       model: Warehouse,
       allowedUpdates: ["stock"],
     });
-  });
+  }
 
   return await Post({
     body,
