@@ -21,7 +21,7 @@ import { useEffect, useState } from "react";
 import { z } from "zod";
 
 const inventaryDefaultValue: { name: string; stock: number }[] = [];
-const productsDefaultValue: { productId: string; stock: number }[] = [];
+const productsDefaultValue: { product: string; stock: number }[] = [];
 
 function RoomAddForm() {
   const [inventary, setinventary] = useState(inventaryDefaultValue);
@@ -42,30 +42,46 @@ function RoomAddForm() {
   };
 
   const onSubmitEditProduct = (data: z.infer<typeof ProductsFormSchema>) => {
-    const referenceWarehouse = productList.find((item: Warehouse) => item.productId === data.productId)
+    const { stock, product } = data;
+
+    const referenceWarehouse = productList.find(
+      (item: Warehouse) => item.productId === product,
+    );
 
     if (data.stock > referenceWarehouse.stock) {
-      return setError("La cantidad del producto en la habitación sobrepasa a la del Almacén")
+      return setError(
+        "La cantidad del producto en la habitación sobrepasa a la del Almacén",
+      );
     }
 
-    setproducts((prev: any) => (prev.length > 0 ? [...prev, data] : [data]));
+    setproducts((prev: any) =>
+      prev.length > 0 ? [...prev, { stock, product }] : [{ product, stock }],
+    );
     setshowAddProducts(false);
   };
 
-  
-  const onSubmit = (data: z.infer<typeof RoomFormSchema>) => {
-    setIsFinished(false)
+  const handleDelete = (i: number, type: "product" | "inventary") => {
+    if (type === "product") {
+      const newProds = products.filter((_prod, index) => i !== index);
+      setproducts(newProds);
+    } else {
+      const newInventary = inventary.filter((_inve, index) => i !== index);
+      setinventary(newInventary);
+    }
+  };
 
-    const newData = { 
+  const onSubmit = (data: z.infer<typeof RoomFormSchema>) => {
+    setIsFinished(false);
+
+    const newData = {
       ...data,
       inventary,
-      products
-     }
+      products,
+    };
 
     handleSubmit(newData);
     setIsFinished(true);
   };
-
 
   useEffect(fetchData, []);
 
@@ -102,12 +118,21 @@ function RoomAddForm() {
             </Button>
           </div>
 
-          <ul className="flex flex-col items-center gap-2">
+          <ul className="flex flex-col gap-2">
             {inventary.length > 0 ? (
               inventary.map((item, i) => (
-                <li key={i} className="border-b border-border p-2 flex justify-center gap-4">
+                <li
+                  key={i}
+                  className="border-b border-border p-2 flex items-center gap-4"
+                >
+                  <Button
+                    variant={"destructive"}
+                    className="rounded cursor-pointer"
+                    onClick={() => handleDelete(i, "inventary")}
+                  >
+                    <Trash2 size={20} color="white" />
+                  </Button>
                   Nombre: {item.name}, Cantidad: {item.stock}
-                  <Trash2 size={20}/>
                 </li>
               ))
             ) : (
@@ -132,14 +157,26 @@ function RoomAddForm() {
             </Button>
           </div>
 
-          <ul className="flex flex-col items-center gap-2">
+          <ul className="flex flex-col gap-2">
             {products.length > 0 ? (
               products.map((prod, i) => (
-                <li key={i} className="border-b border-border P-2">
+                <li
+                  key={i}
+                  className="border-b border-border p-2 flex items-center gap-4"
+                >
+                  <Button
+                    variant={"destructive"}
+                    className="rounded cursor-pointer"
+                    onClick={() => handleDelete(i, "product")}
+                  >
+                    <Trash2 size={20} color="white" />
+                  </Button>
                   Nombre:{" "}
-                  {productList.find(
-                    (item: Warehouse) =>  item.productId === prod.productId
-                  ).name || "cascasc"}
+                  {
+                    productList.find(
+                      (item: Warehouse) => item.productId === prod.product,
+                    ).name
+                  }
                   , Cantidad: {prod.stock}
                 </li>
               ))
@@ -162,7 +199,9 @@ function RoomAddForm() {
               schema={InventaryFormSchema}
               onCancelClick={() => setshowAddInventary(false)}
             >
-              {error && <ErrorMessage error={error} onClose={() => setError("")} />}
+              {error && (
+                <ErrorMessage error={error} onClose={() => setError("")} />
+              )}
               {isLoading && <Loading />}
             </GenericForm>
           </DialogContent>
@@ -182,7 +221,13 @@ function RoomAddForm() {
               schema={ProductsFormSchema}
               onCancelClick={() => setshowAddProducts(false)}
             >
-              {error && <ErrorMessage error={error} onClose={() => setError("")} className="col-span-3"/>}
+              {error && (
+                <ErrorMessage
+                  error={error}
+                  onClose={() => setError("")}
+                  className="col-span-3"
+                />
+              )}
               {isLoading && <Loading />}
             </GenericForm>
           </DialogContent>

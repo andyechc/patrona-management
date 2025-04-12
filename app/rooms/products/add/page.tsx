@@ -11,12 +11,16 @@ import { useEffect, useState } from "react";
 import {
   inventaryFormConfig,
   InventaryFormSchema,
+  productFormConfig,
+  ProductsFormSchema,
 } from "@/components/forms/schemas/room";
 import PageSection from "@/components/page-section";
 
-function InventaryAddPage() {
+function ProductsAddPage() {
   const { data, fetchData, error, setError, isLoading, handleSubmit }: any =
     useCrudOperations("/api/rooms");
+  const { data: productList, fetchData: fetchProductFromWarehouse }: any =
+    useCrudOperations("/api/warehouse");
   const [isFinished, setIsFinished] = useState(false);
   const room: Room = data;
   const router = useRouter();
@@ -25,13 +29,30 @@ function InventaryAddPage() {
 
   useEffect(() => {
     fetchData(id);
+    fetchProductFromWarehouse();
   }, []);
 
-  async function onSubmit(item: z.infer<typeof InventaryFormSchema>) {
+  async function onSubmit(data: z.infer<typeof ProductsFormSchema>) {
     setIsFinished(false);
-    room.inventary.push(item);
-    const data = { inventary: room.inventary };
-    handleSubmit(data, id);
+    const referenceWarehouse = productList.find(
+      (item: Warehouse) => item.productId === data.product,
+    );
+
+    if (data.stock > referenceWarehouse.stock) {
+      return setError(
+        "La cantidad del producto en la habitación sobrepasa a la del Almacén",
+      );
+    }
+
+    const newData = room.products.map(
+      (prod: { product: Product; stock: number }) => {
+        return { stock: prod.stock, product: prod.product._id };
+      },
+    );
+
+    newData.push(data);
+    console.log(newData);
+    handleSubmit({ products: newData }, id);
     setIsFinished(true);
   }
 
@@ -44,8 +65,8 @@ function InventaryAddPage() {
   }
 
   return (
-    <PageSection title="Añadir Nuevo Ítem de Inventario">
-      {error && <ErrorMessage error={error} onClose={() => setError("")} />}
+    <PageSection title="Añadir Nuevo Producto a la Habitación">
+      {error && <ErrorMessage error={error} />}
       {isLoading && <Loading />}
       {!error && !isLoading && isFinished && (
         <SuccessMessage
@@ -55,14 +76,15 @@ function InventaryAddPage() {
         />
       )}
       <GenericForm
-        formConfig={inventaryFormConfig}
+        formConfig={productFormConfig}
         onSubmit={onSubmit}
-        schema={InventaryFormSchema}
+        schema={ProductsFormSchema}
         defaultValues={{}}
+        selectData={productList}
         onCancelClick={() => router.back()}
       ></GenericForm>
     </PageSection>
   );
 }
 
-export default InventaryAddPage;
+export default ProductsAddPage;
