@@ -48,8 +48,8 @@ export function DataTable<TData>({
   });
 
   return (
-    <div className="w-full">
-      <div className="flex items-center justify-between py-4 flex-wrap gap-3">
+    <div className="w-full flex flex-col gap-2 max-w-[1000px]">
+      <div className="flex items-center justify-between sm:flex-nowrap flex-wrap py-4  gap-3">
         <Input
           placeholder={searchPlaceholder}
           value={(table.getColumn(searchKey)?.getFilterValue() as string) ?? ""}
@@ -67,7 +67,7 @@ export function DataTable<TData>({
         </div>
       </div>
 
-      <div className="rounded-[5px] border ">
+      <div className="rounded-[5px] border">
         <Table>
           <TableHeader className="sticky top-0 left-0 z-10">
             {table.getHeaderGroups().map((headerGroup) => (
@@ -76,7 +76,7 @@ export function DataTable<TData>({
                   <TableHead key={header.id}>
                     {flexRender(
                       header.column.columnDef.header,
-                      header.getContext()
+                      header.getContext(),
                     )}
                   </TableHead>
                 ))}
@@ -92,7 +92,7 @@ export function DataTable<TData>({
                     <TableCell key={cell.id}>
                       {flexRender(
                         cell.column.columnDef.cell,
-                        cell.getContext()
+                        cell.getContext(),
                       )}
                     </TableCell>
                   ))}
