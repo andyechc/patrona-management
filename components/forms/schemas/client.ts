@@ -62,3 +62,34 @@ export const clientFormConfig: FormFieldConfig[] = [
     placeholder: "Selecciona el estado",
   },
 ];
+
+export const ClientFormServicesSchema = z.object({
+  description: z
+    .string()
+    .min(2, {
+      message: "La descripción debe tener al menos 2 caracteres.",
+    })
+    .trim(),
+  price: z.number().positive("El precio debe ser positivo"),
+});
+
+export type ClientFormServicesValues = z.infer<typeof ClientFormServicesSchema>;
+
+export const clientFormServicesConfig: FormFieldConfig[] = [
+  {
+    name: "price",
+    label: "Precio",
+    type: "number",
+    description: "Precio del servicio",
+    placeholder: "0.00",
+    colspan: 3,
+  },
+  {
+    name: "description",
+    label: "Descripción",
+    type: "text",
+    description: "Descripción del servicio",
+    placeholder: "Servicio de Taxi",
+    colspan: 3,
+  },
+];

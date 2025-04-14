@@ -15,12 +15,10 @@ const client = new Schema({
     type: String,
     unique: true,
   },
-  services: {
+  factura: {
     type: Array,
   },
-  consume: {
-    type: Array,
-  },
+  rooms: Array,
   status: {
     type: String,
     enum: ["activo", "inactivo"],
