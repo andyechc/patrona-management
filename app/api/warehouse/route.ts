@@ -5,6 +5,7 @@ import { cashregisterOperations } from "@/services/cashregister-operations";
 import { dailyLogOperations } from "@/services/daily-log-operation";
 import { Post } from "@/utils/api/method-handler";
 import { NextResponse } from "next/server";
+import { exec } from "node:child_process";
 
 export async function GET() {
   try {
@@ -28,7 +29,7 @@ export async function GET() {
           purchasePrice: "$product.purchasePrice",
           salePrice: "$product.salePrice",
           category: "$product.category",
-          currency: "$product.currency"
+          currency: "$product.currency",
         },
       },
     ]);

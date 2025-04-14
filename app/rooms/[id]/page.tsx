@@ -3,10 +3,11 @@ import ErrorMessage from "@/components/error-message";
 import Loading from "@/components/loading";
 import PageSection from "@/components/page-section";
 import { useCrudOperations } from "@/hooks/useCrudOperation";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useEffect } from "react";
 import InventaryTable from "../inventary/inventary-table";
 import ProductsTable from "@/app/rooms/products/products-table";
+import { Button } from "@/components/ui/button";
 
 function DetailRoomPage() {
   const { id } = useParams();
@@ -20,6 +21,12 @@ function DetailRoomPage() {
     setError,
   }: any = useCrudOperations("/api/rooms");
   const room: Room = data;
+  const router = useRouter();
+
+  const handleDeleteRoom = () => {
+    handleDelete(id);
+    router.replace("/rooms");
+  };
 
   useEffect(() => {
     fetchData(id);
@@ -38,7 +45,7 @@ function DetailRoomPage() {
       {isLoading && <Loading />}
       {error && <ErrorMessage error={error} onClose={() => setError("")} />}
 
-      <div className="flex items-center flex-wrap gap-4">
+      <div className="w-full flex flex-wrap gap-4">
         <div className="flex flex-col flex-grow">
           <p className="text-xl text-accent-foreground font-thin">Inventario</p>
           <InventaryTable
@@ -58,6 +65,19 @@ function DetailRoomPage() {
             products={room.products}
           />
         </div>
+      </div>
+
+      <div
+        className={
+          "sticky bottom-0 left-0 flex mt-8 gap-4 py-2 px-4 bg-background"
+        }
+      >
+        <Button variant={"secondary"} onClick={() => router.back()}>
+          Volver
+        </Button>
+        <Button variant={"destructive"} onClick={handleDeleteRoom}>
+          Eliminar Habitación
+        </Button>
       </div>
     </PageSection>
   );

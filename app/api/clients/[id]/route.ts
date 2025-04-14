@@ -35,7 +35,15 @@ export async function PUT(
     body,
     id,
     model: Client,
-    allowedUpdates: [],
+    allowedUpdates: [
+      "factura",
+      "name",
+      "email",
+      "phone",
+      "rooms",
+      "dni",
+      "state",
+    ],
   });
 }
 

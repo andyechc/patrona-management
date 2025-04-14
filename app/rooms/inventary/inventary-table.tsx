@@ -9,7 +9,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { ColumnDef } from "@tanstack/react-table";
-import { ArrowUpDown } from "lucide-react";
 import { useState } from "react";
 import { z } from "zod";
 
@@ -69,28 +68,12 @@ function InventaryTable({
   const columns: ColumnDef<Room>[] = [
     {
       accessorKey: "name",
-      header: ({ column }) => (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Nombres
-          <ArrowUpDown />
-        </Button>
-      ),
+      header: () => <Button variant="ghost">Nombres</Button>,
       cell: ({ row }) => <p>{row.getValue("name")}</p>,
     },
     {
       accessorKey: "stock",
-      header: ({ column }) => (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Cantidad
-          <ArrowUpDown />
-        </Button>
-      ),
+      header: () => <Button variant="ghost">Cantidad</Button>,
       cell: ({ row }) => <p>{row.getValue("stock")}</p>,
     },
     {
@@ -99,7 +82,7 @@ function InventaryTable({
       cell: ({ row }) => {
         return (
           <CellActionButton
-            handleDelete={() => handleDelete(row.index)}
+            handleDelete={handleDelete}
             handleEdit={() => handleEdit(row.index)}
           />
         );
