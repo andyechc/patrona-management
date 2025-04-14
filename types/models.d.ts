@@ -43,11 +43,21 @@ declare type Room = {
   inventary: Array;
   products: Array;
 };
+
 declare type Client = {
   _id: string;
   name: string;
   email?: string;
   phone?: number;
   dni?: string;
+  factura: any[];
+  rooms: string[];
   status: "activo" | "inactivo";
+};
+
+declare type Factura = {
+  _id: string;
+  clientId: string;
+  factura: any[];
+  status: "pendiente" | "facturado";
 };
