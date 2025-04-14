@@ -23,17 +23,32 @@ import {
   clientFormConfig,
   ClientFormSchema,
 } from "@/components/forms/schemas/client";
+import { MultiSelect } from "@/components/multi-select";
 
 function ClientAddForm() {
   const { error, isLoading, handleSubmit } = useCrudOperations("/api/clients");
+  const { data: rooms, fetchData } = useCrudOperations("/api/rooms");
+  const [selectedRooms, setSelectedRooms] = useState<string[]>();
   const [isFinished, setIsFinished] = useState(false);
   const router = useRouter();
 
+  const selectRoomsData =
+    rooms.length > 0
+      ? rooms.map((room: Room) => ({
+          value: room._id,
+          label: room.name,
+        }))
+      : [];
+
   const onSubmit = (data: z.infer<typeof ClientFormSchema>) => {
     setIsFinished(false);
-    handleSubmit(data);
+    handleSubmit({ ...data, rooms: selectedRooms || [] });
     setIsFinished(true);
   };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   return (
     <GenericForm
@@ -44,6 +59,19 @@ function ClientAddForm() {
       onSubmit={onSubmit}
       gridcols={4}
     >
+      <div className={"flex flex-col gap-2"}>
+        <p className={"text-sm font-bold"}>Habitaciones</p>
+        <MultiSelect
+          options={selectRoomsData}
+          onValueChange={setSelectedRooms}
+          defaultValue={selectedRooms}
+          placeholder="Selecciona las Habitaciones"
+          variant="inverted"
+          animation={2}
+          maxCount={3}
+        />
+        <p className={"text-sm text-white/70"}>Selecciona las habiatciones.</p>
+      </div>
       {isLoading && <Loading />}
       {error && <ErrorMessage error={error} />}
       {!error && !isLoading && isFinished && (

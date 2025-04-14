@@ -2,12 +2,7 @@
 import { DataTable } from "@/components/data-table/data-table";
 import { Button } from "@/components/ui/button";
 import { ColumnDef } from "@tanstack/react-table";
-import {
-  ArrowRight,
-  ArrowUpDown,
-  CircleDotIcon,
-  LucideDot,
-} from "lucide-react";
+import { ArrowRight, ArrowUpDown } from "lucide-react";
 import { useEffect } from "react";
 import { useCrudOperations } from "@/hooks/useCrudOperation";
 import Link from "next/link";
@@ -31,16 +26,15 @@ function ClientsTable() {
         </Button>
       ),
       cell: ({ row }) => (
-        <Link
-          href={"/clients/" + row.original._id}
-          className="p-2 flex items-center gap-2 "
+        <p
+          className={`
+            "p-2 flex items-center gap-2 text-${
+              row.original.status === "activo" ? "green" : "red"
+            }-500
+          `}
         >
-          {row.getValue("status") === "activo" ? "Activo" : "Inactivo"}{" "}
-          <CircleDotIcon
-            size={18}
-            color={row.original.status === "activo" ? "green" : "red"}
-          />
-        </Link>
+          {row.getValue("status")}
+        </p>
       ),
     },
     {
@@ -55,11 +49,71 @@ function ClientsTable() {
         </Button>
       ),
       cell: ({ row }) => (
+        <div className="p-2 flex items-center justify-between">
+          {row.getValue("name")}
+        </div>
+      ),
+    },
+    {
+      accessorKey: "phone",
+      header: ({ column }) => (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Teléfonos
+          <ArrowUpDown />
+        </Button>
+      ),
+      cell: ({ row }) => (
+        <div className="p-2 flex items-center justify-between">
+          {row.getValue("phone") || "N/A"}
+        </div>
+      ),
+    },
+    {
+      accessorKey: "email",
+      header: ({ column }) => (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Emails
+          <ArrowUpDown />
+        </Button>
+      ),
+      cell: ({ row }) => (
+        <div className="p-2 flex items-center justify-between">
+          {row.getValue("email") || "N/A"}
+        </div>
+      ),
+    },
+    {
+      accessorKey: "dni",
+      header: ({ column }) => (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          DNI
+          <ArrowUpDown />
+        </Button>
+      ),
+      cell: ({ row }) => (
+        <div className="p-2 flex items-center justify-between">
+          {row.getValue("dni") || "N/A"}
+        </div>
+      ),
+    },
+    {
+      id: "action",
+      header: () => {},
+      cell: ({ row }) => (
         <Link
           href={"/clients/" + row.original._id}
-          className="p-2 flex items-center justify-between hover:underline"
+          className="p-2 flex items-center justify-between hover:underline bg-foreground rounded text-black"
         >
-          {row.getValue("name")} <ArrowRight size={18} />
+          <ArrowRight size={18} />
         </Link>
       ),
     },
