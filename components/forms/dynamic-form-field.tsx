@@ -28,10 +28,10 @@ export const DynamicFormField = ({
   step,
   selectData = [],
   colspan = 1,
-}: FormFieldConfig & { control: any }) => {
+}: FormFieldConfig & { control?: any }) => {
   return (
     <FormField
-      control={control}
+      control={control || undefined}
       name={name}
       render={({ field }) => (
         <FormItem className={`mt-3 col-span-${colspan}`}>
@@ -88,7 +88,7 @@ export const DynamicFormField = ({
                 className={cn(
                   "border-input placeholder:text-muted-foreground flex h-14 w-full min-w-0 rounded border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none md:text-sm resize-none",
                   "focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]",
-                  "aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive"
+                  "aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
                 )}
                 placeholder={placeholder}
                 {...field}

@@ -17,7 +17,7 @@ import Link from "next/link";
 
 export function AppSidebar() {
   return (
-    <Sidebar collapsible="icon">
+    <Sidebar collapsible="icon" className={"z-100"}>
       <SidebarHeader className="flex justify-center items-center">
         <Image
           alt="Logo con texto 'La Patrona'"
