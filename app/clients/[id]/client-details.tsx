@@ -18,32 +18,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { CarTaxiFront, Milk } from "lucide-react";
-
-const InfoItem = ({
-  text,
-  label,
-  children,
-}: {
-  text?: string;
-  label: string;
-  children?: ReactNode;
-}) => {
-  const isState = (text && text === "Activo") || text === "Inactivo";
-  const className =
-    "text-xl font-semibold text-" +
-    ((isState && (text === "Activo" ? "green-500" : "red-400")) ||
-      "foreground");
-
-  return (
-    <li
-      className={"bg-border/50 flex flex-col gap py-2 px-4 rounded flex-grow"}
-    >
-      <small className={"text-sm font-normal text-white/70"}>{label}</small>
-      {children ? children : <p className={className}>{text || "N/A"}</p>}
-    </li>
-  );
-};
+import { CarTaxiFront, Milk, X } from "lucide-react";
+import InfoItem from "@/components/info-item";
+import { toast } from "sonner";
 
 function ClientsDetails({
   client,
@@ -60,7 +37,7 @@ function ClientsDetails({
   const [roomSelected, setRoomSelected] = useState("");
   const [productSelected, setProductSelected] = useState("");
   const [quantity, setQuantity] = useState(0);
-  const { data: rooms, fetchData } = useCrudOperations("/api/rooms");
+  const { data: rooms, fetchData, error } = useCrudOperations("/api/rooms");
 
   const clientRooms =
     (rooms.length > 0 &&
@@ -72,14 +49,18 @@ function ClientsDetails({
 
   useEffect(() => {
     fetchData();
+
+    if (error) {
+      toast(error, { icon: <X color={"red"} size={16} /> });
+    }
   }, []);
 
   const onSubmitServices = (data: z.infer<typeof ClientFormServicesSchema>) => {
-    const date = new Date().toISOString();
+    const date = new Date().toLocaleString();
     const service = { ...data, type: "servicio", date };
     const newFactura = [...client.factura];
     newFactura.push(service);
-    handleSubmit({ factura: newFactura }, client._id);
+    handleSubmit({ factura: newFactura, type: service.type }, client._id);
     updateDetails();
     setShowAddServices(false);
   };
@@ -87,10 +68,11 @@ function ClientsDetails({
   const selectRoomChangeHandler = (room: string): void => {
     setRoomSelected(room);
 
-    const roomSelected: any = clientRooms.find(
-      (clientRoom: any) => clientRoom.name === room,
-    );
-    const productsFind = roomSelected.products;
+    const roomChose: any = clientRooms.find((clientRoom: any) => {
+      return clientRoom._id === JSON.parse(room).id;
+    });
+
+    const productsFind = roomChose.products;
 
     setProductsToSelect(productsFind || []);
   };
@@ -98,29 +80,43 @@ function ClientsDetails({
   const onSubmitConsumes: FormEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault();
     const newFactura = [...client.factura];
-    const description = `Se Consumió ${quantity} ${JSON.parse(productSelected).product.name} de ${roomSelected}`;
-    const date = new Date().toISOString();
+    const description = `${quantity} ${JSON.parse(productSelected).product.name} de ${JSON.parse(roomSelected).name}`;
+    const date = new Date().toLocaleString();
     const price =
       quantity * parseFloat(JSON.parse(productSelected).product.salePrice);
 
-    const data = { description, date, price, type: "consumo" };
+    const data = {
+      description,
+      date,
+      price,
+      type: "consumo",
+    };
     newFactura.push(data);
-    handleSubmit({ factura: newFactura }, client._id);
+    handleSubmit(
+      {
+        factura: newFactura,
+        productId: JSON.parse(productSelected).product._id,
+        roomId: JSON.parse(roomSelected).id,
+        type: data.type,
+        date: data.date,
+      },
+      client._id,
+    );
     updateDetails();
+    setQuantity(0);
+    setRoomSelected("");
+    setProductSelected("");
     setShowAddConsumes(false);
   };
 
   return (
     <>
-      <ul className={"flex gap-4 flex-wrap justify-between"}>
+      <ul className={"flex gap-2 flex-wrap justify-between"}>
         <InfoItem label={"Nombre"} text={client.name} />
         <InfoItem label={"Email"} text={client.email} />
         <InfoItem label={"Teléfono"} text={client.phone?.toString()} />
         <InfoItem label={"DNI"} text={client.dni} />
-        <InfoItem
-          label={"Estado"}
-          text={client.status === "activo" ? "Activo" : "Inactivo"}
-        />
+        <InfoItem label={"Estado"} text={client.status} />
       </ul>
 
       <ul className={"flex flex-wrap flex-col gap-2"}>
@@ -142,6 +138,7 @@ function ClientsDetails({
       <div className={"border border-border rounded"}>
         <div className={"border-b flex justify-end gap-3 p-4"}>
           <Button
+            disabled={client && client.status === "inactivo"}
             variant={"secondary"}
             className={"rounded"}
             onClick={() => setShowAddServices(true)}
@@ -150,6 +147,7 @@ function ClientsDetails({
           </Button>
           <Button
             className={"rounded"}
+            disabled={client && client.status === "inactivo"}
             onClick={() => setShowAddConsumes(true)}
           >
             <Milk size={18} color={"black"} /> Añadir Consumo
@@ -158,30 +156,24 @@ function ClientsDetails({
 
         <ul className={"flex flex-col gap-2 p-2 transition-all"}>
           {client.factura?.length > 0 ? (
-            client.factura
-              .sort((a: any, b: any) => (b.date > a.date ? 1 : -1))
-              .map((fac: any, i) => (
-                <InfoItem label={"$ " + fac.price} key={i}>
-                  <div
-                    className={"flex justify-between flex-wrap items-center"}
-                  >
-                    <div>
-                      <p>{fac.description}</p>
-                      <small className={"text-foreground/70"}>
-                        {fac.date?.split("T")[0]}
-                      </small>
-                    </div>
-
-                    <p className={`text-foreground/70`}>
-                      {fac.type === "consumo" ? (
-                        <Milk size={18} color={"white"} />
-                      ) : (
-                        <CarTaxiFront size={18} color={"white"} />
-                      )}
-                    </p>
+            client.factura.toReversed().map((fac: any, i) => (
+              <InfoItem label={"$ " + fac.price} key={i}>
+                <div className={"flex justify-between flex-wrap items-center"}>
+                  <div>
+                    <p>{fac.description}</p>
+                    <small className={"text-foreground/70"}>{fac.date}</small>
                   </div>
-                </InfoItem>
-              ))
+
+                  <p className={`text-foreground/70`}>
+                    {fac.type === "consumo" ? (
+                      <Milk size={18} color={"white"} />
+                    ) : (
+                      <CarTaxiFront size={18} color={"white"} />
+                    )}
+                  </p>
+                </div>
+              </InfoItem>
+            ))
           ) : (
             <li className={"p-4 text-center text-white/70"}>
               El cliente no ha consumido ni solicitado servicios.
@@ -189,7 +181,7 @@ function ClientsDetails({
           )}
         </ul>
 
-        <p className={"p-3 text-foreground/70"}>
+        <p className={"p-3 text-foreground/70 border-t border-border"}>
           Total:{" $"}
           {client.factura
             ?.reduce((acc, curr) => acc + curr.price, 0)
@@ -225,6 +217,7 @@ function ClientsDetails({
                 <Select
                   onValueChange={selectRoomChangeHandler}
                   value={roomSelected || ""}
+                  required={true}
                 >
                   <SelectTrigger className="w-fit rounded">
                     <SelectValue placeholder={"Selecciona la habitación"} />
@@ -235,7 +228,10 @@ function ClientsDetails({
                         clientRooms?.length > 0 &&
                         clientRooms?.map((room: any) => (
                           <SelectItem
-                            value={room.name || room._id}
+                            value={JSON.stringify({
+                              name: room.name,
+                              id: room._id,
+                            })}
                             key={room._id}
                             className="rounded"
                           >
@@ -260,6 +256,7 @@ function ClientsDetails({
                   }}
                   value={productSelected || ""}
                   disabled={!roomSelected}
+                  required={true}
                 >
                   <SelectTrigger className="w-fit rounded">
                     <SelectValue placeholder={"Selecciona el Producto"} />
@@ -294,6 +291,7 @@ function ClientsDetails({
                   value={quantity || ""}
                   disabled={!productSelected}
                   type={"number"}
+                  required={true}
                   min={0}
                   max={productSelected ? JSON.parse(productSelected).stock : 0}
                   onChange={(e) => setQuantity(parseInt(e.target.value))}
@@ -303,11 +301,7 @@ function ClientsDetails({
                 </p>
               </div>
 
-              <div
-                className={
-                  "flex justify-start gap-2 mt-4 border-t border-border"
-                }
-              >
+              <div className={"flex justify-start gap-2 mt-4"}>
                 <Button
                   variant={"destructive"}
                   type={"button"}

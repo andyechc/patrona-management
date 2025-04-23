@@ -16,16 +16,15 @@ function CellActionButton({ handleDelete, handleEdit }: CellActionButtonProps) {
           <MoreHorizontal />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent
-        align="end"
-        className="bg-background border rounded"
-      >
-        <DropdownMenuItem
-          onClick={handleEdit}
-          className="p-3 hover:bg-primary-foreground hover:outline-0 text-foreground flex items-center gap-2 cursor-pointer"
-        >
-          Editar
-        </DropdownMenuItem>
+      <DropdownMenuContent align="end" className="bg-background border rounded">
+        {handleEdit && (
+          <DropdownMenuItem
+            onClick={handleEdit}
+            className="p-3 hover:bg-primary-foreground hover:outline-0 text-foreground flex items-center gap-2 cursor-pointer"
+          >
+            Editar
+          </DropdownMenuItem>
+        )}
 
         <DropdownMenuItem
           className="p-3 hover:bg-red-900 hover:outline-0 text-red-300 flex items-center gap-2 cursor-pointer rounded"

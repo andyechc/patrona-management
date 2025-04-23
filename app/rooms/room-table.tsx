@@ -2,12 +2,13 @@
 import { DataTable } from "@/components/data-table/data-table";
 import { Button } from "@/components/ui/button";
 import { ColumnDef } from "@tanstack/react-table";
-import { ArrowRight, ArrowUpDown } from "lucide-react";
+import { ArrowRight, ArrowUpDown, X } from "lucide-react";
 import { useEffect } from "react";
 import { useCrudOperations } from "@/hooks/useCrudOperation";
 import Link from "next/link";
 import ErrorMessage from "@/components/error-message";
 import Loading from "@/components/loading";
+import { toast } from "sonner";
 
 function RoomTable() {
   const { data, error, setError, fetchData, isLoading } =
@@ -38,7 +39,11 @@ function RoomTable() {
 
   useEffect(() => {
     fetchData();
-  }, []);
+
+    if (error) {
+      toast(error, { icon: <X color={"red"} size={16} /> });
+    }
+  }, [error]);
 
   return (
     <>
@@ -49,14 +54,6 @@ function RoomTable() {
         data={data}
         addHref="/rooms/add"
       />
-
-      {error && (
-        <ErrorMessage
-          error={error}
-          onClose={() => setError("")}
-          className="mt-2 m-auto "
-        />
-      )}
 
       {isLoading && <Loading />}
     </>

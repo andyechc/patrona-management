@@ -5,7 +5,6 @@ import { cashregisterOperations } from "@/services/cashregister-operations";
 import { dailyLogOperations } from "@/services/daily-log-operation";
 import { Post } from "@/utils/api/method-handler";
 import { NextResponse } from "next/server";
-import { exec } from "node:child_process";
 
 export async function GET() {
   try {
@@ -52,13 +51,21 @@ export async function POST(request: Request) {
   });
   const amountToDiscount = body.stock * purchasePrice;
 
+  const cashRegisterResult = await cashregisterOperations(
+    "discount",
+    amountToDiscount,
+    currency,
+  );
+
+  if (cashRegisterResult instanceof NextResponse) {
+    return cashRegisterResult; // Retorna el error si hay fondos insuficientes
+  }
+
   await dailyLogOperations({
     title: "Nuevo Producto en Almacén",
     description: `Se realizó una nueva compra y se añadió ${body.stock} ${name} al almacén. Esto ocasionó una pérdida de $${amountToDiscount} ${currency}.`,
     type: "losses",
   });
-
-  await cashregisterOperations("discount", amountToDiscount, currency);
 
   return await Post({
     body,

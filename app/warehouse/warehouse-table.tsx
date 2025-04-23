@@ -3,7 +3,7 @@ import CellActionButton from "@/components/data-table/cell-action-button";
 import { DataTable } from "@/components/data-table/data-table";
 import { Button } from "@/components/ui/button";
 import { ColumnDef } from "@tanstack/react-table";
-import { ArrowUpDown } from "lucide-react";
+import { ArrowUpDown, Edit, Trash, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import {
   Dialog,
@@ -21,6 +21,8 @@ import {
 import Link from "next/link";
 import ErrorMessage from "@/components/error-message";
 import Loading from "@/components/loading";
+import { toast } from "sonner";
+import AcceptAlert from "@/components/accept-alert";
 
 function WarehouseTable() {
   const {
@@ -32,6 +34,8 @@ function WarehouseTable() {
     handleSubmit,
     isLoading,
   } = useCrudOperations("/api/warehouse");
+  const { data: cashRegister, fetchData: fetchCashRegister }: any =
+    useCrudOperations("/api/cash-register");
   const [showEdit, setShowEdit] = useState(false);
   const [warehouseToUpdate, setWarehouseToUpdate] = useState({
     _id: "",
@@ -43,6 +47,8 @@ function WarehouseTable() {
     category: "",
     stock: 0,
   });
+  const [showAcceptAlert, setShowAcceptAlert] = useState(false);
+  const [idToDelete, setIdToDelete] = useState("");
 
   const handleEdit = async (id: string) => {
     const warehouse = data.find((item: Product) => item._id === id);
@@ -144,10 +150,24 @@ function WarehouseTable() {
       cell: ({ row }) => {
         const warehouse = row.original;
         return (
-          <CellActionButton
-            handleDelete={() => handleDelete(warehouse._id)}
-            handleEdit={() => handleEdit(warehouse._id)}
-          />
+          <div className={"flex gap-2 "}>
+            <Button
+              variant={"destructive"}
+              onClick={() => {
+                setShowAcceptAlert(true);
+                setIdToDelete(warehouse._id);
+              }}
+            >
+              <Trash />
+            </Button>
+
+            <Button
+              variant={"default"}
+              onClick={() => handleEdit(warehouse._id)}
+            >
+              <Edit />
+            </Button>
+          </div>
         );
       },
     },
@@ -155,7 +175,14 @@ function WarehouseTable() {
 
   useEffect(() => {
     fetchData();
-  }, []);
+    fetchCashRegister();
+
+    if (error) {
+      toast(error, { icon: <X color={"red"} size={16} /> });
+    }
+  }, [error]);
+
+  console.log(error);
 
   return (
     <>
@@ -167,15 +194,19 @@ function WarehouseTable() {
         addHref="/warehouse/add"
       />
 
-      {error && (
-        <ErrorMessage
-          error={error}
-          onClose={() => setError("")}
-          className="mt-2 m-auto"
+      {isLoading && <Loading />}
+
+      {showAcceptAlert && (
+        <AcceptAlert
+          onAccept={() => {
+            handleDelete(idToDelete);
+            setShowAcceptAlert(false);
+          }}
+          title={"Eliminar Ítem de Almacén"}
+          description={"Seguro que quieres eliminar este ítem de almacén"}
+          onDecline={() => setShowAcceptAlert(false)}
         />
       )}
-
-      {isLoading && <Loading />}
 
       {showEdit && (
         <Dialog open>

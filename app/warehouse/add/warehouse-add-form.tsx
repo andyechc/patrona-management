@@ -12,11 +12,20 @@ import {
   WarehouseFormSchema,
 } from "@/components/forms/schemas/warehouse";
 import { GenericForm } from "@/components/forms/generic-form";
+import { toast } from "sonner";
+import { X } from "lucide-react";
+import excludeFromArray from "@/utils/excludeFromArray";
 
 function WarehouseForm() {
-  const { error, setError, isLoading, handleSubmit } =
-    useCrudOperations("/api/warehouse");
-  const { data, fetchData } = useCrudOperations("/api/products");
+  const {
+    data: warehouse,
+    error,
+    isLoading,
+    handleSubmit,
+    fetchData: fetchWarehouse,
+  }: any = useCrudOperations("/api/warehouse");
+  const { data: products, fetchData: fetchProducts } =
+    useCrudOperations("/api/products");
   const [isFinished, setIsFinished] = useState(false);
   const router = useRouter();
 
@@ -26,7 +35,13 @@ function WarehouseForm() {
     setIsFinished(true);
   }
 
-  useEffect(fetchData, []);
+  useEffect(() => {
+    fetchProducts();
+    fetchWarehouse();
+    if (error) {
+      toast(error, { icon: <X color={"red"} size={16} /> });
+    }
+  }, [error]);
 
   return (
     <GenericForm
@@ -35,19 +50,18 @@ function WarehouseForm() {
         stock: 0,
       }}
       formConfig={warehouseFormConfig}
-      onCancelClick={() => router.back()}
+      onCancelClick={() => router.replace("/warehouse")}
       onSubmit={onSubmit}
       schema={WarehouseFormSchema}
-      selectData={data}
+      selectData={excludeFromArray(products, warehouse, "_id", "productId")}
       gridcols={5}
     >
-      {error && <ErrorMessage error={error} />}
       {isLoading && <Loading />}
       {!error && !isLoading && isFinished && (
         <SuccessMessage
           text="Datos Creados Correctamente"
           title="Tarea Exitosa!"
-          handleConfirm={() => router.back()}
+          handleConfirm={() => router.replace("/warehouse")}
         />
       )}
     </GenericForm>

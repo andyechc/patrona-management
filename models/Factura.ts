@@ -8,9 +8,12 @@ const factura = new Schema({
   factura: {
     type: Array,
   },
+  date: {
+    type: String,
+  },
   status: {
     type: String,
-    enum: ["pendiente", "facturada"],
+    required: true,
   },
 });
 

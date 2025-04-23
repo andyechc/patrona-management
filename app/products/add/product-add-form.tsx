@@ -11,11 +11,12 @@ import { GenericForm } from "@/components/forms/generic-form";
 import ErrorMessage from "@/components/error-message";
 import Loading from "@/components/loading";
 import SuccessMessage from "@/components/success-mesage";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import { X } from "lucide-react";
 
 function ProductAddForm() {
-  const { error, setError, isLoading, handleSubmit } =
-    useCrudOperations("/api/products");
+  const { error, isLoading, handleSubmit } = useCrudOperations("/api/products");
   const [isFinished, setIsFinished] = useState(false);
   const router = useRouter();
 
@@ -24,6 +25,12 @@ function ProductAddForm() {
     handleSubmit(data);
     setIsFinished(true);
   }
+
+  useEffect(() => {
+    if (error) {
+      toast(error, { icon: <X color={"red"} size={16} /> });
+    }
+  }, [error]);
 
   return (
     <GenericForm
@@ -37,19 +44,18 @@ function ProductAddForm() {
         category: "",
         currency: "",
       }}
-      onCancelClick={() => router.back()}
+      onCancelClick={() => router.replace("/products")}
       selectData={[
         { _id: "CUP", name: "CUP" },
         { _id: "USD", name: "USD" },
       ]}
     >
-      {error && <ErrorMessage error={error} onClose={() => setError("")} />}
       {isLoading && <Loading />}
       {!error && !isLoading && isFinished && (
         <SuccessMessage
           text="Datos Creados Correctamente"
           title="Tarea Exitosa!"
-          handleConfirm={() => router.back()}
+          handleConfirm={() => router.replace("/products")}
         />
       )}
     </GenericForm>

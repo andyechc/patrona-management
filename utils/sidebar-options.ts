@@ -7,6 +7,7 @@ import {
   BookOpenTextIcon,
   Logs,
   KeySquare,
+  PencilLine,
 } from "lucide-react";
 
 const options = [
@@ -42,7 +43,7 @@ const options = [
       {
         name: "Facturas",
         id: 3,
-        href: "/facturies",
+        href: "/facturas",
         icon: BookOpenTextIcon,
         isClickable: true,
         isAction: false,
@@ -123,10 +124,10 @@ const options = [
     isEditable: false,
     submenu: [
       {
-        name: "Registro Diario",
-        id: 1,
-        href: "/daily-logs",
-        icon: Logs,
+        name: "Observaciones",
+        id: 2,
+        href: "/notes",
+        icon: PencilLine,
         isClickable: true,
         isAction: false,
         isEditable: false,

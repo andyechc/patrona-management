@@ -5,6 +5,8 @@ import { NextResponse } from "next/server";
 import Warehouse from "@/models/Warehouse";
 import Product from "@/models/Product";
 import { Put } from "@/utils/api/method-handler";
+import Client from "@/models/Client";
+import { dailyLogOperations } from "@/services/daily-log-operation";
 
 export async function GET(
   _: Request,
@@ -34,57 +36,132 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
-  const body: Room = await request.json();
+  const data = await request.json();
+  const body = { ...data };
+  const { productEditedId, inventaryEditedId } = data;
 
-  const { products } = body;
+  await dbConnect();
 
-  if (products) {
-    const warehouses = await Warehouse.aggregate([
-      {
-        $lookup: {
-          from: Product.collection.collectionName,
-          localField: "productId",
-          foreignField: "_id",
-          as: "product",
-        },
-      },
-      { $unwind: "$product" },
-      {
-        $project: {
-          _id: "$_id",
-          productId: "$productId",
-          stock: "$stock",
-          name: "$product.name",
-          purchasePrice: "$product.purchasePrice",
-          salePrice: "$product.salePrice",
-          category: "$product.category",
-          currency: "$product.currency",
-        },
-      },
-    ]);
+  console.log(inventaryEditedId);
 
-    for (const prod of products) {
-      const warehouseReference = warehouses.find(
-        (item: any) => item.productId.toString() === prod.product,
-      );
-      {
-        if (!warehouseReference) {
-          return NextResponse.json(
-            { success: false, message: "Producto en Almacén no encontrado" },
-            { status: 400 },
-          );
-        }
-      }
-
-      console.log("resta", { stock: warehouseReference.stock - prod.stock });
-      await Put({
-        body: { stock: warehouseReference.stock - prod.stock },
-        id: warehouseReference._id,
-        model: Warehouse,
-        allowedUpdates: ["stock"],
-      });
-    }
+  if (inventaryEditedId) {
+    delete body.inventaryEditedId;
+    return await Put({
+      body,
+      id,
+      model: Room,
+      allowedUpdates: ["name", "inventary", "products"],
+    });
   }
+
+  const warehouses: Warehouse[] = await Warehouse.aggregate([
+    {
+      $lookup: {
+        from: Product.collection.collectionName,
+        localField: "productId",
+        foreignField: "_id",
+        as: "product",
+      },
+    },
+    { $unwind: "$product" },
+    {
+      $project: {
+        _id: "$_id",
+        productId: "$productId",
+        stock: "$stock",
+        name: "$product.name",
+        purchasePrice: "$product.purchasePrice",
+        salePrice: "$product.salePrice",
+        category: "$product.category",
+        currency: "$product.currency",
+      },
+    },
+  ]);
+
+  const warehouseReference = warehouses.find(
+    (item) => item.productId.toString() === productEditedId,
+  );
+
+  if (!warehouseReference) {
+    return NextResponse.json(
+      { success: false, message: "Producto en Almacén no encontrado" },
+      { status: 400 },
+    );
+  }
+
+  const product: any = await Product.findById(productEditedId);
+
+  const prevRoom = await Room.findById(id).populate({
+    path: "products.product",
+    model: "Product",
+  });
+
+  const prevProduct = prevRoom?.products.find(
+    (prod: any) => prod.product._id.toString() === productEditedId,
+  );
+
+  const newStock = body.products.find((prod: any) => {
+    if (typeof prod.product === "string") {
+      return prod.product === productEditedId;
+    }
+    return prod.product._id === productEditedId;
+  }).stock;
+
+  if (!prevProduct) {
+    await dailyLogOperations({
+      title: "Nuevo Producto en " + prevRoom.name,
+      description: `Se movió ${newStock} ${product.name} a ${prevRoom.name}. Quedando en el almacén ${warehouseReference.stock - newStock}`,
+      type: "info",
+    });
+
+    await Put({
+      body: {
+        stock: warehouseReference.stock - newStock,
+      },
+      id: warehouseReference._id,
+      model: Warehouse,
+      allowedUpdates: ["stock"],
+    });
+  }
+
+  if (prevProduct && newStock > 0) {
+    await dailyLogOperations({
+      title: "Producto Editado en " + prevRoom.name,
+      description: `Se editó el producto ${product.name} en ${prevRoom.name}. Ahora su cantidad es de ${newStock}, Quedando en el almacén ${warehouseReference.stock + (prevProduct.stock - newStock)}`,
+      type: "info",
+    });
+
+    await Put({
+      body: {
+        stock: warehouseReference.stock + (prevProduct.stock - newStock),
+      },
+      id: warehouseReference._id,
+      model: Warehouse,
+      allowedUpdates: ["stock"],
+    });
+  }
+
+  if (newStock === 0) {
+    await dailyLogOperations({
+      title: "Producto Eliminado de " + prevRoom.name,
+      description: `Se eliminó el producto ${prevProduct.product.name} en ${prevRoom.name}. Quedando en el almacén ${warehouseReference.stock + prevProduct.stock}`,
+      type: "info",
+    });
+
+    await Put({
+      body: {
+        stock: warehouseReference.stock + prevProduct.stock,
+      },
+      id: warehouseReference._id,
+      model: Warehouse,
+      allowedUpdates: ["stock"],
+    });
+  }
+
+  body.products = data.products.filter((prod: any) => prod.stock > 0);
+
+  delete body.productEditedId;
+  delete body.type;
 
   return await Put({
     body,
@@ -111,14 +188,34 @@ export async function DELETE(
       );
     }
 
-    const data = await Room.findByIdAndDelete(id);
+    const room: Room | null = await Room.findById(id);
+    const clients: Client[] = await Client.find();
 
-    if (!data) {
+    if (!room) {
       return NextResponse.json(
         { success: false, message: "No Encontrado" },
         { status: 404 },
       );
     }
+
+    const clientFounded = clients.find((client) => {
+      return client.rooms.map((clientRoom) => clientRoom === room._id);
+    });
+
+    if (clientFounded) {
+      return NextResponse.json(
+        {
+          success: false,
+          message:
+            "No se puede eliminar esta habitación. El cliente " +
+            clientFounded.name +
+            " la está ocupando.",
+        },
+        { status: 400 },
+      );
+    }
+
+    const data = await Room.findByIdAndDelete(id);
 
     return NextResponse.json(data, { status: 200 });
   } catch (error) {

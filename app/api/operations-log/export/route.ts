@@ -15,9 +15,9 @@ export async function GET() {
             (log.type === "losses" && "Pérdida") ||
             (log.type === "warn" && "Advertencia") ||
             "Informativo"
-          }\nFecha: ${parseDate(log.date.toISOString())}\nTítulo: ${
+          }\nFecha: ${log.date}\nTítulo: ${
             log.title
-          }\nDescripción: ${log.description}\n\n`
+          }\nDescripción: ${log.description}\n\n`,
       )
       .join("");
 

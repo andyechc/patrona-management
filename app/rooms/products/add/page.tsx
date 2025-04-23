@@ -7,14 +7,17 @@ import { GenericForm } from "@/components/forms/generic-form";
 import ErrorMessage from "@/components/error-message";
 import Loading from "@/components/loading";
 import SuccessMessage from "@/components/success-mesage";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import {
   productFormConfig,
   ProductsFormSchema,
 } from "@/components/forms/schemas/room";
 import PageSection from "@/components/page-section";
+import { toast } from "sonner";
+import { X } from "lucide-react";
+import excludeFromArray from "@/utils/excludeFromArray";
 
-function ProductsAddPage() {
+function ProductsAddPageContent() {
   const { data, fetchData, error, setError, isLoading, handleSubmit }: any =
     useCrudOperations("/api/rooms");
   const { data: productList, fetchData: fetchProductFromWarehouse }: any =
@@ -28,7 +31,11 @@ function ProductsAddPage() {
   useEffect(() => {
     fetchData(id);
     fetchProductFromWarehouse();
-  }, []);
+
+    if (error) {
+      toast(error, { icon: <X color={"red"} size={16} /> });
+    }
+  }, [error]);
 
   async function onSubmit(data: z.infer<typeof ProductsFormSchema>) {
     setIsFinished(false);
@@ -38,7 +45,7 @@ function ProductsAddPage() {
 
     if (data.stock > referenceWarehouse.stock) {
       return setError(
-        "La cantidad del producto en la habitación sobrepasa a la del Almacén",
+        "La cantidad del producto en la habitación excede a la del Almacén",
       );
     }
 
@@ -49,8 +56,7 @@ function ProductsAddPage() {
     );
 
     newData.push(data);
-    console.log(newData);
-    handleSubmit({ products: newData }, id);
+    handleSubmit({ products: newData, productEditedId: data.product }, id);
     setIsFinished(true);
   }
 
@@ -61,28 +67,45 @@ function ProductsAddPage() {
       </PageSection>
     );
   }
-
+  console.log(room.products, productList);
   return (
     <PageSection title="Añadir Nuevo Producto a la Habitación">
-      {error && <ErrorMessage error={error} />}
-      {isLoading && <Loading />}
-      {!error && !isLoading && isFinished && (
-        <SuccessMessage
-          text="Datos Creados Correctamente"
-          title="Tarea Exitosa!"
-          handleConfirm={() => router.back()}
-        />
-      )}
-      <GenericForm
-        formConfig={productFormConfig}
-        onSubmit={onSubmit}
-        schema={ProductsFormSchema}
-        defaultValues={{}}
-        selectData={productList}
-        onCancelClick={() => router.back()}
-      ></GenericForm>
+      <Suspense>
+        {isLoading && <Loading />}
+        {!error && !isLoading && isFinished && (
+          <SuccessMessage
+            text="Datos Creados Correctamente"
+            title="Tarea Exitosa!"
+            handleConfirm={() => router.replace("/rooms/" + id)}
+          />
+        )}
+        <GenericForm
+          formConfig={productFormConfig}
+          onSubmit={onSubmit}
+          schema={ProductsFormSchema}
+          defaultValues={{}}
+          selectData={
+            (data.products &&
+              excludeFromArray(
+                productList,
+                room.products,
+                "productId",
+                "product",
+                "_id",
+              )) ||
+            []
+          }
+          onCancelClick={() => router.replace("/rooms/" + id)}
+        ></GenericForm>
+      </Suspense>
     </PageSection>
   );
 }
 
-export default ProductsAddPage;
+export default function ProductAddPage() {
+  return (
+    <Suspense fallback={<Loading />}>
+      <ProductsAddPageContent />
+    </Suspense>
+  );
+}

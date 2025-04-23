@@ -37,6 +37,13 @@ declare type DailyLog = {
   date: string;
 };
 
+declare type Notes = {
+  _id: string;
+  title: string;
+  description: string;
+  date: string;
+};
+
 declare type Room = {
   _id: string;
   name: string;
@@ -59,5 +66,6 @@ declare type Factura = {
   _id: string;
   clientId: string;
   factura: any[];
-  status: "pendiente" | "facturado";
+  date: string;
+  status: "pendiente" | "pagado";
 };

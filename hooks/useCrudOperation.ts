@@ -14,13 +14,20 @@ export const useCrudOperations = (endpoint: string) => {
 
   const handleDelete = (id: string) => {
     const url = id ? `${endpoint}/${id}` : endpoint;
-    Delete({ url, setError, setIsLoading }).then(() => fetchData);
+    Delete({ url, setError, setIsLoading }).then(() => fetchData());
   };
 
   const handleSubmit = (values: any, id?: string) => {
     const operation = id
-      ? Put({ url: `${endpoint}/${id}`, data: values, setError, setIsLoading })
-      : Post({ url: endpoint, data: values, setError, setIsLoading });
+      ? Put({
+          url: `${endpoint}/${id}`,
+          data: values,
+          setError,
+          setIsLoading,
+        }).then(() => fetchData())
+      : Post({ url: endpoint, data: values, setError, setIsLoading }).then(() =>
+          fetchData(),
+        );
 
     operation.then(() => fetchData);
   };

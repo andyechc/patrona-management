@@ -3,6 +3,8 @@ import Client from "@/models/Client";
 import { isValidObjectId } from "mongoose";
 import { NextResponse } from "next/server";
 import { Put } from "@/utils/api/method-handler";
+import Product from "@/models/Product";
+import Room from "@/models/Room";
 
 export async function GET(
   _: Request,
@@ -29,7 +31,55 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
-  const body: Client = await request.json();
+  const data = await request.json();
+  const body = { ...data };
+
+  if (body.type === "consumo") {
+    const { productId, roomId } = data;
+    delete body.productId;
+    delete body.roomId;
+    delete body.date;
+
+    const currentRoom: Room = await Room.findById(roomId).populate({
+      path: "products.product",
+      model: "Product",
+    });
+    const currentRoomProducts = currentRoom.products;
+    const filterProducts = currentRoomProducts.filter(
+      (prod: any) => prod.product._id.toString() !== productId,
+    );
+    const productUpdated = currentRoomProducts.find(
+      (prod: any) => prod.product._id.toString() === productId,
+    );
+
+    const dataQuantity = parseInt(
+      data.factura
+        .find((fact: any) => fact.date === data.date)
+        .description.split(" ")[0],
+    );
+
+    const oldStock = productUpdated.stock;
+    const newStock = oldStock - dataQuantity;
+    productUpdated.stock = newStock;
+
+    if (newStock > 0) {
+      filterProducts.push(productUpdated);
+    }
+
+    await Put({
+      body: { products: filterProducts },
+      id: roomId,
+      model: Room,
+      allowedUpdates: ["products"],
+    });
+  }
+
+  delete body.type;
+  // const sortedFactura = body.factura.sort(
+  //   (a: any, b: any) => (a.type > b.type ? 1 : -1),
+  //   0,
+  // );
+  // body.factura = sortedFactura;
 
   return await Put({
     body,
@@ -42,7 +92,7 @@ export async function PUT(
       "phone",
       "rooms",
       "dni",
-      "state",
+      "status",
     ],
   });
 }

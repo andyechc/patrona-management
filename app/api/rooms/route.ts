@@ -4,6 +4,7 @@ import Room from "@/models/Room";
 import Warehouse from "@/models/Warehouse";
 import { Post, Put } from "@/utils/api/method-handler";
 import { NextResponse } from "next/server";
+import { dailyLogOperations } from "@/services/daily-log-operation";
 
 export async function GET() {
   try {
@@ -49,12 +50,24 @@ export async function POST(request: Request) {
     },
   ]);
 
+  const productsDb = await Product.find();
+
   const { products } = body;
 
   for (const prod of products) {
     const warehouseReference = warehouses.find(
       (item: any) => item.productId.toString() === prod.product,
     );
+
+    const prodForLog = productsDb.find(
+      (prodDb: any) => prodDb._id.toString() === prod.product,
+    );
+
+    await dailyLogOperations({
+      title: "Nuevo Producto en " + body.name,
+      description: `Se movió ${prod.stock} ${prodForLog.name} a ${body.name}. Quedando en el almacén ${warehouseReference.stock - prod.stock}`,
+      type: "info",
+    });
 
     await Put({
       body: { stock: warehouseReference.stock - prod.stock },

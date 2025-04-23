@@ -34,7 +34,7 @@ export const DynamicFormField = ({
       control={control || undefined}
       name={name}
       render={({ field }) => (
-        <FormItem className={`mt-3 col-span-${colspan}`}>
+        <FormItem className={`mt-3 col-span-${colspan} flex flex-col gap-2`}>
           <FormLabel>{label}</FormLabel>
           <FormControl>
             {type === "number" ? (
@@ -66,7 +66,7 @@ export const DynamicFormField = ({
                       selectData.map((item: any) => (
                         <SelectItem
                           value={item.productId || item._id}
-                          key={item._id}
+                          key={item.productId || item._id}
                           className="rounded"
                         >
                           {item.name}{" "}

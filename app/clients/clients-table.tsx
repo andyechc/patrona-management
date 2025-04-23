@@ -2,12 +2,13 @@
 import { DataTable } from "@/components/data-table/data-table";
 import { Button } from "@/components/ui/button";
 import { ColumnDef } from "@tanstack/react-table";
-import { ArrowRight, ArrowUpDown } from "lucide-react";
+import { ArrowRight, ArrowUpDown, X } from "lucide-react";
 import { useEffect } from "react";
 import { useCrudOperations } from "@/hooks/useCrudOperation";
 import Link from "next/link";
 import ErrorMessage from "@/components/error-message";
 import Loading from "@/components/loading";
+import { toast } from "sonner";
 
 function ClientsTable() {
   const { data, error, setError, fetchData, isLoading } =
@@ -28,9 +29,9 @@ function ClientsTable() {
       cell: ({ row }) => (
         <p
           className={`
-            "p-2 flex items-center gap-2 text-${
+            "px-2 text-center text-foreground rounded bg-${
               row.original.status === "activo" ? "green" : "red"
-            }-500
+            }-800
           `}
         >
           {row.getValue("status")}
@@ -121,7 +122,11 @@ function ClientsTable() {
 
   useEffect(() => {
     fetchData();
-  }, []);
+
+    if (error) {
+      toast(error, { icon: <X color={"red"} size={16} /> });
+    }
+  }, [error]);
 
   return (
     <>
@@ -132,14 +137,6 @@ function ClientsTable() {
         data={data}
         addHref="/clients/add"
       />
-
-      {error && (
-        <ErrorMessage
-          error={error}
-          onClose={() => setError("")}
-          className="mt-2 m-auto col-span-3"
-        />
-      )}
 
       {isLoading && <Loading />}
     </>

@@ -12,7 +12,9 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
-  body.date = Date();
+  body.date = new Date().toLocaleString();
+
+  console.log(body);
 
   if (body.amount) {
     const typeOperation = body.type === "losses" ? "discount" : "increment";

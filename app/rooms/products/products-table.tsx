@@ -10,17 +10,17 @@ import {
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { ColumnDef } from "@tanstack/react-table";
-import { ArrowUpDown } from "lucide-react";
-import { useEffect, useState } from "react";
+import { ArrowUpDown, Edit, Trash } from "lucide-react";
 import { z } from "zod";
-import { useCrudOperations } from "@/hooks/useCrudOperation";
-import ErrorMessage from "@/components/error-message";
+import { useState } from "react";
+import AcceptAlert from "@/components/accept-alert";
 
 type ProductTableProps = {
   products: any[];
   id: string;
   handleSubmit: (value: any, id: string) => void;
   updateDetails: () => void;
+  productList: any;
 };
 
 function ProductsTable({
@@ -28,13 +28,8 @@ function ProductsTable({
   id,
   handleSubmit,
   updateDetails,
+  productList,
 }: ProductTableProps) {
-  const {
-    data: productList,
-    fetchData,
-    setError,
-    error,
-  }: any = useCrudOperations("/api/warehouse");
   const [showEdit, setshowEdit] = useState(false);
   const [prodToEdit, setProdToEdit] = useState({
     _id: "",
@@ -45,6 +40,8 @@ function ProductsTable({
     },
     stock: 0,
   });
+  const [showAcceptAlert, setShowAcceptAlert] = useState(false);
+  const [idToDelete, setIdToDelete] = useState("");
 
   const handleEdit = (id: string) => {
     const prodFound = products.find((prod) => prod._id === id);
@@ -57,14 +54,12 @@ function ProductsTable({
   const onSubmitEdit = async (data: z.infer<typeof ProductsFormSchema>) => {
     if (prodToEdit.stock === data.stock) return setshowEdit(false);
 
-    const referenceWarehouse = productList.find(
+    const referenceWarehouse: any = productList.find(
       (item: Warehouse) => item.productId === prodToEdit.product._id,
     );
 
     if (data.stock > referenceWarehouse.stock) {
-      return setError(
-        "La cantidad del producto en la habitación sobrepasa a la del Almacén",
-      );
+      return;
     }
 
     const filterProducts = products.filter(
@@ -75,17 +70,34 @@ function ProductsTable({
     });
     newData.push({ stock: data.stock, product: prodToEdit.product._id });
 
-    console.log("new", newData);
-
-    handleSubmit({ products: newData }, id);
+    handleSubmit(
+      {
+        products: newData,
+        productEditedId: prodToEdit.product._id,
+      },
+      id,
+    );
     updateDetails();
     setshowEdit(false);
   };
 
   const handleDelete = (idToDelete: string) => {
-    const filterProducts = products.filter((prod) => prod._id !== idToDelete);
+    const filterProducts = products.filter(
+      (prod) => prod.product._id !== idToDelete,
+    );
+    const findProduct = products.find(
+      (prod) => prod.product._id === idToDelete,
+    );
+    findProduct.stock = 0;
+    filterProducts.push(findProduct);
 
-    handleSubmit({ products: filterProducts }, id);
+    handleSubmit(
+      {
+        products: filterProducts,
+        productEditedId: idToDelete,
+      },
+      id,
+    );
     updateDetails();
   };
 
@@ -118,7 +130,7 @@ function ProductsTable({
           <ArrowUpDown />
         </Button>
       ),
-      cell: ({ row }) => <p>{row.original.product.salePrice}</p>,
+      cell: ({ row }) => <p>${row.original.product.salePrice}</p>,
     },
     {
       accessorKey: "stock",
@@ -141,18 +153,28 @@ function ProductsTable({
       enableHiding: false,
       cell: ({ row }) => {
         return (
-          <CellActionButton
-            handleDelete={() => handleDelete(row.original._id)}
-            handleEdit={() => handleEdit(row.original._id)}
-          />
+          <div className={"flex gap-2 "}>
+            <Button
+              variant={"destructive"}
+              onClick={() => {
+                setShowAcceptAlert(true);
+                setIdToDelete(row.original.product._id);
+              }}
+            >
+              <Trash />
+            </Button>
+
+            <Button
+              variant={"default"}
+              onClick={() => handleEdit(row.original._id)}
+            >
+              <Edit />
+            </Button>
+          </div>
         );
       },
     },
   ];
-
-  useEffect(() => {
-    fetchData();
-  }, []);
 
   return (
     <>
@@ -164,6 +186,20 @@ function ProductsTable({
         addHref={"/rooms/products/add?id=" + id}
       />
 
+      {showAcceptAlert && (
+        <AcceptAlert
+          onAccept={() => {
+            handleDelete(idToDelete);
+            setShowAcceptAlert(false);
+          }}
+          onDecline={() => setShowAcceptAlert(false)}
+          description={
+            "Seguro que desea eliminar este producto de esta habitación."
+          }
+          title={"Eliminar Producto de Habitación"}
+        />
+      )}
+
       {showEdit && (
         <Dialog open>
           <DialogContent className="rounded">
@@ -171,10 +207,6 @@ function ProductsTable({
               Editar Producto: {prodToEdit.product.name} - $
               {prodToEdit.product.salePrice}
             </DialogTitle>
-
-            {error && (
-              <ErrorMessage error={error} onClose={() => setError("")} />
-            )}
 
             <GenericForm
               defaultValues={prodToEdit}

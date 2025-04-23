@@ -7,14 +7,14 @@ import { GenericForm } from "@/components/forms/generic-form";
 import ErrorMessage from "@/components/error-message";
 import Loading from "@/components/loading";
 import SuccessMessage from "@/components/success-mesage";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import {
   inventaryFormConfig,
   InventaryFormSchema,
 } from "@/components/forms/schemas/room";
 import PageSection from "@/components/page-section";
 
-function InventaryAddPage() {
+function InventaryAddPageContent() {
   const { data, fetchData, error, setError, isLoading, handleSubmit }: any =
     useCrudOperations("/api/rooms");
   const [isFinished, setIsFinished] = useState(false);
@@ -28,9 +28,15 @@ function InventaryAddPage() {
   }, []);
 
   async function onSubmit(item: z.infer<typeof InventaryFormSchema>) {
+    console.log(item);
     setIsFinished(false);
-    room.inventary.push(item);
-    const data = { inventary: room.inventary };
+    room.inventary?.push(item);
+
+    const data = {
+      inventary: room.inventary || [item],
+      inventaryEditedId:
+        Date.now().toString(36) + Math.random().toString(36).substring(2),
+    };
     handleSubmit(data, id);
     setIsFinished(true);
   }
@@ -45,24 +51,32 @@ function InventaryAddPage() {
 
   return (
     <PageSection title="Añadir Nuevo Ítem de Inventario">
-      {error && <ErrorMessage error={error} onClose={() => setError("")} />}
-      {isLoading && <Loading />}
-      {!error && !isLoading && isFinished && (
-        <SuccessMessage
-          text="Datos Creados Correctamente"
-          title="Tarea Exitosa!"
-          handleConfirm={() => router.back()}
-        />
-      )}
-      <GenericForm
-        formConfig={inventaryFormConfig}
-        onSubmit={onSubmit}
-        schema={InventaryFormSchema}
-        defaultValues={{}}
-        onCancelClick={() => router.back()}
-      ></GenericForm>
+      <Suspense>
+        {error && <ErrorMessage error={error} onClose={() => setError("")} />}
+        {isLoading && <Loading />}
+        {!error && !isLoading && isFinished && (
+          <SuccessMessage
+            text="Datos Creados Correctamente"
+            title="Tarea Exitosa!"
+            handleConfirm={() => router.replace("/rooms/" + id)}
+          />
+        )}
+        <GenericForm
+          formConfig={inventaryFormConfig}
+          onSubmit={onSubmit}
+          schema={InventaryFormSchema}
+          defaultValues={{}}
+          onCancelClick={() => router.replace("/rooms/" + id)}
+        ></GenericForm>
+      </Suspense>
     </PageSection>
   );
 }
 
-export default InventaryAddPage;
+export default function InventaryAddPage() {
+  return (
+    <Suspense fallback={<Loading />}>
+      <InventaryAddPageContent />
+    </Suspense>
+  );
+}

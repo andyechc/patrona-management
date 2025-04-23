@@ -3,7 +3,7 @@ import CellActionButton from "@/components/data-table/cell-action-button";
 import { DataTable } from "@/components/data-table/data-table";
 import { Button } from "@/components/ui/button";
 import { ColumnDef } from "@tanstack/react-table";
-import { ArrowUpDown } from "lucide-react";
+import { ArrowRight, ArrowUpDown, Edit, Trash, X } from "lucide-react";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import {
   Dialog,
@@ -21,22 +21,17 @@ import {
 } from "@/components/forms/schemas/product";
 import ErrorMessage from "@/components/error-message";
 import Loading from "@/components/loading";
+import AcceptAlert from "@/components/accept-alert";
+import { toast } from "sonner";
 
 function ProductsTable() {
   const [showEdit, setShowEdit] = useState(false);
-  const {
-    data,
-    error,
-    setError,
-    isLoading,
-    fetchData,
-    handleDelete,
-    handleSubmit,
-  } = useCrudOperations("/api/products");
+  const { data, error, isLoading, fetchData, handleDelete, handleSubmit } =
+    useCrudOperations("/api/products");
 
   const [productToUpdate, setProductToUpdate]: [
     Product,
-    Dispatch<SetStateAction<Product>>
+    Dispatch<SetStateAction<Product>>,
   ] = useState({
     _id: "",
     name: "",
@@ -45,6 +40,8 @@ function ProductsTable() {
     category: "",
     currency: "",
   });
+  const [showAcceptAlert, setShowAcceptAlert] = useState(false);
+  const [idToDelete, setIdToDelete] = useState("");
 
   const handleEdit = async (id: string) => {
     const product = data.find((item: Product) => item._id === id);
@@ -131,10 +128,21 @@ function ProductsTable() {
       cell: ({ row }) => {
         const product = row.original;
         return (
-          <CellActionButton
-            handleDelete={() => handleDelete(product._id)}
-            handleEdit={() => handleEdit(product._id)}
-          />
+          <div className={"flex gap-2 "}>
+            <Button
+              variant={"destructive"}
+              onClick={() => {
+                setShowAcceptAlert(true);
+                setIdToDelete(product._id);
+              }}
+            >
+              <Trash />
+            </Button>
+
+            <Button variant={"default"} onClick={() => handleEdit(product._id)}>
+              <Edit />
+            </Button>
+          </div>
         );
       },
     },
@@ -142,7 +150,10 @@ function ProductsTable() {
 
   useEffect(() => {
     fetchData();
-  }, []);
+    if (error) {
+      toast(error, { icon: <X color={"red"} size={16} /> });
+    }
+  }, [error]);
 
   return (
     <>
@@ -154,15 +165,19 @@ function ProductsTable() {
         addHref="/products/add"
       />
 
-      {error && (
-        <ErrorMessage
-          error={error}
-          onClose={() => setError("")}
-          className="mt-2 m-auto"
+      {isLoading && <Loading />}
+
+      {showAcceptAlert && (
+        <AcceptAlert
+          onAccept={() => {
+            handleDelete(idToDelete);
+            setShowAcceptAlert(false);
+          }}
+          description={"Seguro que desea eliminar este producto?"}
+          title={"Eliminar Producto"}
+          onDecline={() => setShowAcceptAlert(false)}
         />
       )}
-
-      {isLoading && <Loading />}
 
       {showEdit && (
         <Dialog open>

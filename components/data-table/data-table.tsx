@@ -48,7 +48,7 @@ export function DataTable<TData>({
   });
 
   return (
-    <div className="w-full flex flex-col gap-2 max-w-[1000px]">
+    <div className="flex flex-col gap-2 max-w-[1000px]m-auto">
       <div className="flex items-center justify-between sm:flex-nowrap flex-wrap py-4  gap-3">
         <Input
           placeholder={searchPlaceholder}
@@ -60,10 +60,12 @@ export function DataTable<TData>({
         />
         <div className="flex gap-2">
           {actionComponents}
-          <LinkButton href={addHref}>
-            <Plus />
-            Añadir
-          </LinkButton>
+          {addHref && (
+            <LinkButton href={addHref}>
+              <Plus />
+              Añadir
+            </LinkButton>
+          )}
         </div>
       </div>
 

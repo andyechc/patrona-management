@@ -51,7 +51,14 @@ function InventaryTable({
     );
     filterInventary.push(data);
 
-    handleSubmit({ inventary: filterInventary }, id);
+    handleSubmit(
+      {
+        inventary: filterInventary,
+        inventaryEditedId:
+          Date.now().toString(36) + Math.random().toString(36).substring(2),
+      },
+      id,
+    );
     updateDetails();
     setshowEdit(false);
   };
@@ -61,7 +68,14 @@ function InventaryTable({
       (_item, i) => i !== itemToEdit.index,
     );
 
-    handleSubmit({ inventary: filterInventary }, id);
+    handleSubmit(
+      {
+        inventary: filterInventary,
+        inventaryEditedId:
+          Date.now().toString(36) + Math.random().toString(36).substring(2),
+      },
+      id,
+    );
     updateDetails();
   };
 

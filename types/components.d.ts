@@ -15,13 +15,13 @@ declare type DataTableProps<TData> = {
   searchKey: string;
   searchPlaceholder?: string;
   pageSize?: number;
-  addHref: string;
+  addHref?: string;
   actionComponents?: React.ReactNode;
 };
 
 declare type CellActionButtonProps = {
   handleDelete: MouseEventHandler<HTMLDivElement>;
-  handleEdit: MouseEventHandler<HTMLDivElement>;
+  handleEdit?: MouseEventHandler<HTMLDivElement>;
 };
 
 declare type GenericFormProps = {

@@ -9,7 +9,14 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useCrudOperations } from "@/hooks/useCrudOperation";
-import { ArrowLeftRight, Edit, Eye, EyeClosed, KeyRound } from "lucide-react";
+import {
+  ArrowLeftRight,
+  Edit,
+  Eye,
+  EyeClosed,
+  KeyRound,
+  X,
+} from "lucide-react";
 import { z } from "zod";
 import ChangeCurrencyForm from "./change-currency-form";
 import ErrorMessage from "@/components/error-message";
@@ -18,7 +25,8 @@ import SuccessMessage from "@/components/success-mesage";
 import { Button } from "@/components/ui/button";
 import ChangeAmountForm from "./change-amount-form";
 import PasswordInput from "@/components/forms/password-input";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 function CurrencyInfo({
   primary,
@@ -33,7 +41,7 @@ function CurrencyInfo({
   const [showChangeAmout, setShowChangeAmount] = useState(false);
   const [showChangePass, setShowChangePass] = useState(false);
   const [isFinished, setIsFinished] = useState(false);
-  const [exchange, setExchange] = useState(defaultExchange)
+  const [exchange, setExchange] = useState(defaultExchange);
 
   function onSubmitAmount(data: z.infer<typeof ChangeAmountFormSchema>) {
     const cashregister = {
@@ -45,7 +53,8 @@ function CurrencyInfo({
 
     if (id) handleSubmit(cashregister, id);
     else handleSubmit(cashregister);
-    setIsFinished(true);
+    // setIsFinished(true);
+    setShowChangeAmount(false);
   }
 
   function onSubmitCurrency(data: z.infer<typeof ExchangeFormSchema>) {
@@ -72,7 +81,7 @@ function CurrencyInfo({
       handleSubmit(cashregister, id);
     }
 
-    setIsFinished(true);
+    setShowChangeCurrency(false);
   }
 
   function onSubmitPass(e: any) {
@@ -85,15 +94,22 @@ function CurrencyInfo({
 
     if (oldpass !== atob(password)) {
       return setError(
-        "La contraseña anterior que introdujo no coincide, revísela por favor."
+        "La contraseña anterior que introdujo no coincide, revísela por favor.",
       );
     }
 
     const data = { password: btoa(newpass) };
 
     handleSubmit(data, id);
-    setIsFinished(true);
+    // setIsFinished(true);
+    setShowChangePass(false);
   }
+
+  useEffect(() => {
+    if (error) {
+      toast(error, { icon: <X color={"red"} size={16} /> });
+    }
+  }, [error]);
 
   return (
     <div className="flex gap-3 items-center justify-between flex-wrap">
@@ -103,7 +119,9 @@ function CurrencyInfo({
       </div>
 
       <div className="flex gap-2">
-        <h2 className="text-5xl font-extrabold font-mono">{secondary?.amount}</h2>
+        <h2 className="text-5xl font-extrabold font-mono">
+          {secondary?.amount}
+        </h2>
         <p className="text-accent-foreground/50">{secondary?.currency}</p>
       </div>
 
@@ -165,7 +183,7 @@ function CurrencyInfo({
         <Dialog open>
           <DialogContent className="rounded">
             <DialogTitle>Cambio de Moneda</DialogTitle>
-            {error && <ErrorMessage error={error} />}
+
             {isLoading && <Loading />}
             {!error && !isLoading && isFinished && (
               <SuccessMessage

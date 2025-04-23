@@ -28,8 +28,14 @@ function RoomAddForm() {
   const [showAddInventary, setshowAddInventary] = useState(false);
   const [products, setproducts] = useState(productsDefaultValue);
   const [showAddProducts, setshowAddProducts] = useState(false);
-  const { error, setError, isLoading, handleSubmit } =
-    useCrudOperations("/api/rooms");
+  const {
+    data: rooms,
+    error,
+    setError,
+    isLoading,
+    handleSubmit,
+    fetchData: fetchRooms,
+  } = useCrudOperations("/api/rooms");
   const { data: productList, fetchData }: any =
     useCrudOperations("/api/warehouse");
   const [isFinished, setIsFinished] = useState(false);
@@ -50,7 +56,7 @@ function RoomAddForm() {
 
     if (data.stock > referenceWarehouse.stock) {
       return setError(
-        "La cantidad del producto en la habitación sobrepasa a la del Almacén",
+        "La cantidad del producto en la habitación excede a la del Almacén",
       );
     }
 
@@ -83,7 +89,10 @@ function RoomAddForm() {
     setIsFinished(true);
   };
 
-  useEffect(fetchData, []);
+  useEffect(() => {
+    fetchData();
+    fetchRooms();
+  }, []);
 
   return (
     <>
@@ -91,7 +100,7 @@ function RoomAddForm() {
         defaultValues={defaultValues}
         formConfig={roomFormConfig}
         schema={RoomFormSchema}
-        onCancelClick={() => router.back()}
+        onCancelClick={() => router.replace("/rooms")}
         onSubmit={onSubmit}
         gridcols={4}
       >
@@ -100,139 +109,10 @@ function RoomAddForm() {
           <SuccessMessage
             text="Datos Creados Correctamente"
             title="Tarea Exitosa!"
-            handleConfirm={() => router.back()}
+            handleConfirm={() => router.replace("/rooms")}
           />
         )}
-
-        <div className="flex flex-col gap-8 col-span-3 mt-4">
-          <div className="flex items-center gap-4 ">
-            <b className="text-xl font-bold">Inventario</b>
-            <Button
-              variant={"default"}
-              type="button"
-              className="rounded cursor-pointer"
-              size={"icon"}
-              onClick={() => setshowAddInventary(true)}
-            >
-              <Plus />
-            </Button>
-          </div>
-
-          <ul className="flex flex-col gap-2">
-            {inventary.length > 0 ? (
-              inventary.map((item, i) => (
-                <li
-                  key={i}
-                  className="border-b border-border p-2 flex items-center gap-4"
-                >
-                  <Button
-                    variant={"destructive"}
-                    className="rounded cursor-pointer"
-                    onClick={() => handleDelete(i, "inventary")}
-                  >
-                    <Trash2 size={20} color="white" />
-                  </Button>
-                  Nombre: {item.name}, Cantidad: {item.stock}
-                </li>
-              ))
-            ) : (
-              <li className="border-b border-border p-2">
-                No hay ítems en el inventario
-              </li>
-            )}
-          </ul>
-        </div>
-
-        <div className="flex flex-col gap-8 col-span-3 mt-4">
-          <div className="flex items-center gap-4 ">
-            <b className="text-xl font-bold">Productos</b>
-            <Button
-              variant={"default"}
-              type="button"
-              className="rounded cursor-pointer"
-              size={"icon"}
-              onClick={() => setshowAddProducts(true)}
-            >
-              <Plus />
-            </Button>
-          </div>
-
-          <ul className="flex flex-col gap-2">
-            {products.length > 0 ? (
-              products.map((prod, i) => (
-                <li
-                  key={i}
-                  className="border-b border-border p-2 flex items-center gap-4"
-                >
-                  <Button
-                    variant={"destructive"}
-                    className="rounded cursor-pointer"
-                    onClick={() => handleDelete(i, "product")}
-                  >
-                    <Trash2 size={20} color="white" />
-                  </Button>
-                  Nombre:{" "}
-                  {
-                    productList.find(
-                      (item: Warehouse) => item.productId === prod.product,
-                    ).name
-                  }
-                  , Cantidad: {prod.stock}
-                </li>
-              ))
-            ) : (
-              <li className="border-b border-border p-2">No hay productos</li>
-            )}
-          </ul>
-        </div>
       </GenericForm>
-
-      {showAddInventary && (
-        <Dialog open>
-          <DialogContent className="rounded">
-            <DialogTitle>Añade un Ítem</DialogTitle>
-
-            <GenericForm
-              defaultValues={{}}
-              formConfig={inventaryFormConfig}
-              onSubmit={onSubmitEditInventary}
-              schema={InventaryFormSchema}
-              onCancelClick={() => setshowAddInventary(false)}
-            >
-              {error && (
-                <ErrorMessage error={error} onClose={() => setError("")} />
-              )}
-              {isLoading && <Loading />}
-            </GenericForm>
-          </DialogContent>
-        </Dialog>
-      )}
-
-      {showAddProducts && (
-        <Dialog open>
-          <DialogContent className="rounded">
-            <DialogTitle>Añade un Producto</DialogTitle>
-
-            <GenericForm
-              defaultValues={{}}
-              formConfig={productFormConfig}
-              onSubmit={onSubmitEditProduct}
-              selectData={productList}
-              schema={ProductsFormSchema}
-              onCancelClick={() => setshowAddProducts(false)}
-            >
-              {error && (
-                <ErrorMessage
-                  error={error}
-                  onClose={() => setError("")}
-                  className="col-span-3"
-                />
-              )}
-              {isLoading && <Loading />}
-            </GenericForm>
-          </DialogContent>
-        </Dialog>
-      )}
     </>
   );
 }

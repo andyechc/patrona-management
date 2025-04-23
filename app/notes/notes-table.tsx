@@ -10,19 +10,19 @@ import { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown, File, Trash2 } from "lucide-react";
 import { useEffect } from "react";
 
-export default function DailyLogsTable() {
+export default function NotesTable() {
   const { data, error, setError, isLoading, fetchData, handleDelete }: any =
-    useCrudOperations("/api/operations-log");
+    useCrudOperations("/api/notes");
 
   const handleExport = async () => {
     try {
-      const response = await fetch("/api/operations-log/export");
+      const response = await fetch("/api/notes/export");
       const blob = await response.blob();
 
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = "registros.txt";
+      a.download = "observaciones.txt";
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -32,19 +32,6 @@ export default function DailyLogsTable() {
   };
 
   const columns: ColumnDef<DailyLog>[] = [
-    {
-      accessorKey: "type",
-      header: ({ column }) => (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Tipo
-          <ArrowUpDown />
-        </Button>
-      ),
-      cell: ({ row }) => <div>{typeLogParser(row.getValue("type"))}</div>,
-    },
     {
       accessorKey: "date",
       header: ({ column }) => (
@@ -56,7 +43,7 @@ export default function DailyLogsTable() {
           <ArrowUpDown />
         </Button>
       ),
-      cell: ({ row }) => <div>{parseDate(row.getValue("date"))}</div>,
+      cell: ({ row }) => <div>{row.getValue("date")}</div>,
     },
     {
       accessorKey: "title",
@@ -97,7 +84,7 @@ export default function DailyLogsTable() {
   return (
     <div className="flex flex-col gap-2">
       <DataTable
-        addHref="/daily-logs/add"
+        addHref="/notes/add"
         columns={columns}
         data={data}
         searchKey="date"
@@ -110,7 +97,7 @@ export default function DailyLogsTable() {
               onClick={() => handleDelete()}
             >
               <Trash2 />
-              Eliminar Registros
+              Eliminar Observaciones
             </Button>
             <Button
               variant={"outline"}
@@ -118,7 +105,7 @@ export default function DailyLogsTable() {
               onClick={handleExport}
             >
               <File />
-              Exportar Registros
+              Exportar Observaciones
             </Button>
           </>
         }
